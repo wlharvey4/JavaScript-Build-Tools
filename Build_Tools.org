@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-22 07:14
-#+macro: version Version 0.0.4
+#+date:2019-08-22 07:20
+#+macro: version Version 0.0.5
 
 * Babel
 ** Description
@@ -280,6 +280,42 @@ module.exports = {
 below are not supported).  {{{command(webpack)}}} needs ~Promise~ for
 ~import()~ and ~require.ensure()~.  If you want to support older browsers, you
 will need to load a polyfill before using these expressions.
+
+** Entry Points
+#+cindex:@code{entry} property
+#+cindex:configuration, entry
+ There are multiple ways to define the =entry= property in your webpack
+ configuration.
+
+*** Single Entry Shorthand Syntax
+
+*** Object Syntax
+
+*** Scenarios
+
+**** Separate App and Vendor Entries
+
+**** Multi-page Application
+
+** Output
+
+** Loaders
+
+** Plugins
+
+** Configuration
+
+** Modules
+
+** Module Resolution
+
+** Dependency Graph
+
+** Targets
+
+** The Manifest
+
+** Hot Module Replacement
 
 ** Module Bundler Resources
 For a better understanding of the ideas behind module bundlers and how they
