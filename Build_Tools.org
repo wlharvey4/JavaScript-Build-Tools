@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-22 07:09
-#+macro: version Version 0.0.3
+#+date:2019-08-22 07:14
+#+macro: version Version 0.0.4
 
 * Babel
 ** Description
@@ -250,8 +250,36 @@ In the example above, the ~html-webpack-plugin~ generates an HTML file for your
 application by injecting automatically all your generated bundles.
 
 *** Mode
+By setting the mode parameter to either:
+
+- =development=
+- =production= (default)
+- =none=
+
+
+{{{noindent}}}you can enable webpack's built-in optimizations that correspond
+to each environment.  The default value is =production=.
+
+#+caption:webpack.config.js Demonstrating Mode
+#+name:webpack-config-demonstrating-mode
+#+begin_src js
+module.exports = {
+  mode: 'production'
+};
+#+end_src
 
 *** Browser Compatibility
+#+cindex:browsers
+#+cindex:ES5-compliant
+#+cindex:IE8
+#+cindex:@file{Promise}
+#+cindex:@code{import()}
+#+cindex:@code{reqeuire.ensure()}
+#+cindex:polyfill
+{{{command(webpack)}}} supports all browsers that are ES5-compliant (IE8 and
+below are not supported).  {{{command(webpack)}}} needs ~Promise~ for
+~import()~ and ~require.ensure()~.  If you want to support older browsers, you
+will need to load a polyfill before using these expressions.
 
 ** Module Bundler Resources
 For a better understanding of the ideas behind module bundlers and how they
