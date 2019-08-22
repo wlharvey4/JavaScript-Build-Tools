@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-22 06:59
-#+macro: version Version 0.0.2
+#+date:2019-08-22 07:09
+#+macro: version Version 0.0.3
 
 * Babel
 ** Description
@@ -206,6 +206,48 @@ instructs {{{command(webpack)}}} to match a single file with an absolute path
 '.txt'; this is likely not your intention.
 
 *** Plugins
+#+cindex:plugin
+While loaders are used to transform certain types of modules, /plugins/ can be
+leveraged to perform a wider range of tasks like:
+
+- bundle optimization,
+- asset management and
+- injection of environment variables
+
+
+#+cindex:plugins list
+See [[https://webpack.js.org/plugins][list of plugins]] for many available plugins.
+
+{{{heading(Using Plugins)}}}
+
+In order to use a plugin, you need to ~require()~ it and add it to the
+=plugins= array.  Most plugins are customizable through options.  Since you can
+use a plugin multiple times in a config for different purposes, you need to
+create an instance of it by calling it with the ~new~ operator.
+
+#+caption:webpack.config.js Demonstrating plugins
+#+name:webpack-config-demonstrating-plugins
+#+begin_src js
+const HtmlWebpackPlugin = require('html-webpack-plugin'); //installed via npm
+const webpack = require('webpack'); //to access built-in plugins
+
+module.exports = {
+  module: {
+    rules: [
+      { test: /\.txt$/, use: 'raw-loader' }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({template: './src/index.html'})
+  ]
+};
+#+end_src
+
+#+cindex:HTML file
+#+cindex:HTML plugin
+#+cindex:plugin, HTML
+In the example above, the ~html-webpack-plugin~ generates an HTML file for your
+application by injecting automatically all your generated bundles.
 
 *** Mode
 
