@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-22 07:26
-#+macro: version Version 0.0.6
+#+date:2019-08-22 08:16
+#+macro: version Version 0.0.7
 
 * Babel
 ** Description
@@ -325,12 +325,67 @@ a "multi-main entry".  This is useful when you would like to inject multiple
 dependent files together and graph their dependencies into one "chunk".
 
 *** Object Syntax
+#+cindex:object syntax, @code{entry}
+#+cindex:@code{entry} property, object syntax
+The object syntax is more verbose.  However, this is the most scalable way of
+defining =entry/entries= in your application.
+
+{{{heading(Usage for Object Syntax)}}}
+
+: entry: {[entryChunkName: string]: string|Array<string>}
+
+#+caption:webpack.config.js Entry Object Syntax example
+#+name:webpack-config-entry-object-syntax
+#+begin_src js
+module.exports = {
+  entry: {
+    app: './src/app.js',
+    adminApp: './src/adminApp.js'
+  }
+};
+#+end_src
 
 *** Scenarios
-
 **** Separate App and Vendor Entries
+In webpack version < 4 it was common to add vendors as a separate entry point
+to compile it as a separate file (in combination with the ~CommonsChunkPlugin~).
+
+This is discouraged in webpack 4.  Instead, the =optimization.splitChunks=
+option takes care of separating vendors and app modules and creating a separate
+file.  Do not create an entry for vendors or other stuff that is not the
+starting point of execution.
 
 **** Multi-page Application
+As a rule of thumb: Use exactly one entry point for each HTML document.
+
+#+cindex:multi-page application
+#+cindex:scenario, mutli-page application
+#+caption:webpack.config.js Entry Multi-page App Scenario
+#+name:webpack-config-entry-multi-page-app-scenario
+#+begin_src js
+module.exports = {
+  entry: {
+    pageOne: './src/pageOne/index.js',
+    pageTwo: './src/pageTwo/index.js',
+    pageThree: './src/pageThree/index.js'
+  }
+};
+#+end_src
+
+#+cindex:dependency graphs, multiple
+We are telling {{{command(webpack)}}} that we would like 3 separate dependency
+graphs.  In a multi-page application, the server is going to fetch a new HTML
+document for you.  The page reloads this new document and assets are
+redownloaded.  However, this gives us the unique opportunity to do multiple
+things:
+
+  #+cindex:@code{optimization.splitChunks}
+  #+cindex:shared application code
+  #+cindex:multi-page applications
+- ~optimization.splitChunks~ :: use this to create bundles of shared
+     application code between each page.  Multi-page applications that reuse a
+     lot of code/modules between entry points can greatly benefit from these
+     techniques, as the number of entry points increases.
 
 ** Output
 
