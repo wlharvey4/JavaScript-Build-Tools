@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-22 23:33
-#+macro: version Version 0.0.8
+#+date:2019-08-26 12:09
+#+macro: version Version 0.0.9
 
 * Babel
 ** Description
@@ -787,14 +787,323 @@ module.exports = [{
 #+end_src
 
 ** Modules
+{{{heading(WebPack Modules)}}}
+
+#+cindex:Node.js
+#+cindex:modular programming
+#+cindex:module
+#+cindex:modular JavaScript
+Node.js has supported modular programming almost since its inception.  On the
+web, however, support for modules has been slow to arrive.  Multiple tools
+exist that support modular JavaScript on the web, with a variety of benefits
+and limitations.  {{{command(webpack)}}} builds on lessons learned from these
+systems and applies the concept of modules to any file in your project.
+
+{{{subheading(WebPack Module Dependencies)}}}
+
+In contrast to Node.js modules, {{{command(webpack)}}} modules can express
+their dependencies in a variety of ways.  A few examples are:
+
+#+cindex:ES2015
+#+cindex:import statement
+- An ES2015 import statement
+
+  #+cindex:CommonJS
+  #+cindex:@code{require()} statement
+- A CommonJS ~require()~ statement
+
+  #+cindex:AMD
+  #+cindex:@code{define} statement
+  #+cindex:@code{require} statement
+- An AMD ~define~ and ~require~ statement
+
+  #+cindex:@code{@@import} statement
+  #+cindex:css/sass/less file
+- An =@import= statement inside of a css/sass/less file.
+
+  #+cindex:image url
+  #+cindex:@code{url(...)}
+  #+cindex:@code{<img src=...>}
+- An image url in a stylesheet (~url(...)~) or html (~<img src=...>~) file.
+
+
+{{{subheading(Supported Module Types)}}}
+
+#+cindex:loaders
+{{{command(webpack)}}} supports modules written in a variety of languages and
+preprocessors, via loaders.  Loaders describe to {{{command(webpack)}}} how to
+process non-JavaScript modules and include these dependencies into your
+bundles.  The {{{command(webpack)}}} community has built loaders for a wide
+variety of popular languages and language processors, including:
+
+- CoffeeScript
+
+- TypeScript
+
+- ESNext (Babel)
+
+- Sass
+
+- Less
+
+- Stylus
+
+
+See [[https://webpack.js.org/loaders][Loaders]] for a full list of loaders.
+
+Overall, {{{command(webpack)}}} provides a powerful and rich API for
+customization that allows one to use {{{command(webpack)}}} for any stack,
+while staying non-opinionated about your development, testing, and production
+workflows.
 
 ** Module Resolution
+#+cindex:resolver
+A /resolver/ is a library which helps in locating a module by its absolute
+path.  A module can be required as a dependency from another module as:
+
+: import foo from 'path/to/module';
+or
+: require('path/to/module');
+
+The dependency module can be from the application code or a third-party
+library.  The resolver helps {{{command(webpack)}}} find the module code that
+needs to be included in the bundle for every such =require/import= statement.
+{{{command(webpack)}}} uses [[https://github.com/webpack/enhanced-resolve][enhanced-resolve]] to resolve file paths while
+bundling modules.
+
+*** Resolving Rules
+Using [[https://github.com/webpack/enhanced-resolve][enhanced-resolve]], webpack can resolve three kinds of file paths:
+
+{{{heading(Absolute paths)}}}
+
+#+begin_src js
+import '/home/me/file';
+
+import 'C:\\Users\\me\\file';
+#+end_src
+
+Since we already have the absolute path to the file, no further resolution is
+required.
+
+{{{heading(Relative paths)}}}
+
+#+begin_src js
+import '../src/file1';
+import './file2';
+#+end_src
+
+In this case, the directory of the resource file where the =import= or
+=require= occurs is taken to be the =context= directory.  The relative path
+specified in the =import/require= is joined to this =context= path to produce
+the absolute path to the module.
+
+{{{heading(Module paths)}}}
+
+#+begin_src js
+import 'module';
+import 'module/lib/file';
+#+end_src
+
+Modules are searched for inside all directories specified in =resolve.modules=.
+You can replace the original module path by an alternate path by creating an
+alias for it using the =resolve.alias= configuration option.  Once the path is
+resolved based on the above rule, the resolver checks to see if the path points
+to a file or a directory.  If the path points to a file:
+
+- If the path has a file extension, then the file is bundled straightaway.
+
+- Otherwise, the file extension is resolved using the =resolve.extensions=
+  option, which tells the resolver which extensions (eg - ~.js~, ~.jsx~) are
+  acceptable for resolution.
+
+
+If the path points to a folder, then the following steps are taken to find the
+right file with the right extension:
+
+- If the folder contains a =package.json= file, then fields specified in
+  =resolve.mainFields= configuration option are looked up in order, and the
+  first such field in ~package.json~ determines the file path.
+
+- If there is no ~package.json~ or if the main fields do not return a valid
+  path, file names specified in the ~resolve.mainFiles~ configuration option
+  are looked for in order, to see if a matching filename exists in the
+  =imported/required= directory.
+
+- The file extension is then resolved in a similar way using the
+  =resolve.extensions= option.
+
+
+{{{command(webpack)}}} provides reasonable defaults for these options depending
+on your build target.
+
+*** Resolving Loaders
+This follows the same rules as those specified for file resolution.  But the
+=resolveLoader= configuration option can be used to have separate resolution
+rules for loaders.
+
+*** Caching
+Every filesystem access is cached, so that multiple parallel or serial requests
+to the same file occur faster.  In watch mode, only modified files are evicted
+from the cache.  If watch mode is off, then the cache gets purged before every
+compilation.
+
+See [[https://webpack.js.org/configuration/resolve][Resolve API]] to learn more on the configuration options mentioned above.
 
 ** Dependency Graph
+#+cindex:dependency
+Any time one file /depends/ on another, webpack treats this as a dependency.
+This allows webpack to take non-code assets, such as images or web fonts, and
+also provide them as dependencies for your application.
+
+When webpack processes your application, it starts from a list of modules
+defined on the command line or in its config file.  Starting from these entry
+points, webpack recursively builds a dependency graph that includes every
+module your application needs, then bundles all of those modules into a small
+number of bundles --- often, just one --- to be loaded by the browser.
+
+#+cindex:HTTP/1.1
+#+cindex:HTTP/2
+#+cindex:Code Splitting
+#+begin_cartouche
+Bundling your application is especially powerful for HTTP/1.1 clients, as it
+minimizes the number of times your app has to wait while the browser starts a
+new request.  For HTTP/2, you can also use Code Splitting to achieve best
+results.
+#+end_cartouche
 
 ** Targets
+#+cindex:target
+#+cindex:deployment target
+Because JavaScript can be written for both server and browser,
+{{{command(webpack)}}} offers multiple /deployment targets/ that you can set in
+your webpack configuration.
+
+To set the =target= property, you simply set the =target= value in your webpack
+config:
+
+#+cindex:caption:Webpack Config Target Property
+#+name:webpack.config.js-target-property
+#+begin_src js
+module.exports = {
+  target: 'node'
+};
+#+end_src
+
+In the example above, using node, {{{command(webpack)}}} will compile for usage
+in a Node.js--like environment (uses Node.js require to load chunks and not
+touch any built in modules like ~fs~ or ~path~).
+
+Each /target/ has a variety of deployment/environment specific additions,
+support to fit its needs.  See what [[https://webpack.js.org/configuration/target/][targets are available]].
+
+*** Multiple Targets
+Although {{{command(webpack)}}} does not support multiple strings being passed
+into the =target= property, you can create an /isomorphic library/ by bundling
+two separate configurations:
+
+#+caption:Isomorphic Library for multiple targets
+#+name:isomorphic-library
+#+begin_src js
+const path = require('path');
+const serverConfig = {
+  target: 'node',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'lib.node.js'
+  }
+  //…
+};
+
+const clientConfig = {
+  target: 'web', // <=== can be omitted as default is 'web'
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'lib.js'
+  }
+  //…
+};
+
+module.exports = [ serverConfig, clientConfig ];
+#+end_src
+
+The example above will create a ~lib.js~ and ~lib.node.js~ file in your ~dist~
+folder.
+
+*** Resources
+As seen from the options above, there are multiple deployment targets that you
+can choose from.  Below is a list of examples and resources that you can refer
+to.
+
+- [[https://github.com/TheLarkInn/compare-webpack-target-bundles][compare-webpack-target-bundles]] ::
+
+     A great resource for testing and viewing different webpack targets. Also
+     great for bug reporting.
+
+- [[https://github.com/chentsulin/electron-react-boilerplate][Boilerplate of Electron-React Application]] ::
+
+     A good example of a build process for electron's main process and renderer
+     process.
 
 ** The Manifest
+In a typical application or site built with {{{command(webpack)}}}, there are
+three main types of code:
+
+1. The source code you, and maybe your team, have written.
+
+2. Any third-party library or "vendor" code your source is dependent on.
+
+3. A webpack runtime and manifest that conducts the interaction of all modules.
+
+
+{{{heading(Runtime)}}}
+
+The runtime, along with the manifest data, is basically all the code
+{{{command(webpack)}}} needs to connect your modularized application while it's
+running in the browser.  It contains the loading and resolving logic needed to
+connect your modules as they interact.  This includes connecting modules that
+have already been loaded into the browser as well as logic to lazy-load the
+ones that haven't.
+
+{{{heading(Manifest)}}}
+
+#+cindex:manifest
+Once your application hits the browser in the form of ~index.html~ file, some
+bundles and a variety of other assets required by your application must be
+loaded and linked somehow.  That ~/src~ directory you meticulously laid out is
+now bundled, minified and maybe even split into smaller chunks for lazy-loading
+by webpack's optimization.  So how does {{{command(webpack)}}} manage the
+interaction between all of your required modules?  This is where the manifest
+data comes in...
+
+As the compiler enters, resolves, and maps out your application, it keeps
+detailed notes on all your modules.  This collection of data is called the
+"Manifest," and it's what the runtime will use to resolve and load modules once
+they've been bundled and shipped to the browser.  No matter which module syntax
+you have chosen, those =import= or =require= statements have now become
+=__webpack_require__= methods that point to module identifiers.  Using the data
+in the manifest, the runtime will be able to find out where to retrieve the
+modules behind the identifiers.
+
+{{{heading(The Problem)}}}
+
+So now you have a little bit of insight about how {{{command(webpack)}}} works
+behind the scenes.  "But, how does this affect me?", you might ask.  The simple
+answer is that most of the time it doesn't.  The runtime will do its thing,
+utilizing the manifest, and everything will appear to just magically work once
+your application hits the browser.  However, if you decide to improve the
+performance of your projects by utilizing browser caching, this process will
+all of a sudden become an important thing to understand.
+
+By using content hashes within your bundle file names, you can indicate to the
+browser when the content of a file has changed, thus invalidating the cache.
+Once you start doing this though, you'll immediately notice some funny
+behavior.  Certain hashes change even when their content apparently does not.
+This is caused by the injection of the runtime and manifest, which changes
+every build.
+
+See [[https://webpack.js.org/guides/output-management/#the-manifest][the manifest section]] of our Output management guide to learn how to extract
+the manifest, and read the guides below to learn more about the intricacies of
+long term caching.
 
 ** Hot Module Replacement
 
