@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-27 05:55
-#+macro: version Version 0.0.11
+#+date:2019-08-27 08:20
+#+macro: version Version 0.0.12
 
 * NPM
 ** About NPM
@@ -73,6 +73,214 @@ Some tips:
 Version must be parseable by {{{command(node-semver)}}}, which is bundled with
 {{{command(npm)}}} as a dependency.  (=npm install semver= to use it
 yourself.).  More on version numbers and ranges at [[https://docs.npmjs.com/misc/semver][semver]].
+
+***** Description
+#+cindex:@code{description} field
+#+cindex:@code{npm search}
+The =description= field is a string designed to help people discover your
+package;it will be listed in ~npm search~.
+
+***** Keywords
+#+cindex:@code{keywords} field
+#+cindex:@code{npm search}
+The =keywords= field is an array strings, which are also designed to help
+people discovery your package as it is listed in ~npm search~.
+
+***** Homepage
+#+cindex:@code{homepage} field
+The url to the project homepage.
+
+***** Bugs
+#+cindex:@code{bugs} field
+#+cindex:url
+#+cindex:email
+#+cindex:@code{npm bugs}
+The url to your project’s issue tracker and / or the email address to which
+issues should be reported.  These are helpful for people who encounter issues
+with your package.
+
+#+begin_src js
+bugs: {"url": <URI>, "email": <EMAIL>}
+#+end_src
+
+You can specify either one or both values.  If you want to provide only a url,
+you can specify the value for “bugs” as a simple string instead of an object.
+If a url is provided, it will be used by the ~npm bugs~ command.
+
+***** License
+#+cindex:@code{license} field
+#+cindex:SPDX license expression
+You should specify a license for your package so that people know how they are
+permitted to use it, and any restrictions you’re placing on it.  If you’re
+using a common license such as BSD-2-Clause or MIT, add a current SPDX license
+identifier for the license you’re using, like this:
+
+: { "license" : "BSD-3-Clause" }
+
+You can check [[https://spdx.org/licenses/][the full list of SPDX license IDs]].  Ideally you should pick one
+that is [[https://opensource.org/licenses/alphabetical][OSI]] approved.
+
+If your package is licensed under multiple common licenses, use an [[https://www.npmjs.com/package/spdx][SPDX license
+expression syntax version 2.0 string]], like this:
+
+: { "license" : "(ISC OR GPL-3.0)" }
+
+If you are using a license that hasn’t been assigned an SPDX identifier, or if
+you are using a custom license, use a string value like this one:
+
+: { "license" : "SEE LICENSE IN <filename>" }
+
+Then include a file named =<filename>= at the top level of the package.
+
+if you do not wish to grant others the right to use a private or unpublished
+package under any terms:
+
+: { "license": "UNLICENSED" }
+
+Consider also setting ="private": true= to prevent accidental publication.
+
+***** People Fields---Author and Contributors
+#+cindex:@code{people} fields
+#+cindex:@code{author} field
+#+cindex:@code{contributors} field
+The “author” is one person. “contributors” is an array of people.  A “person” is
+an object with a “name” field and optionally “url” and “email”, like this:
+
+#+begin_src js
+{ "name" : "Barney Rubble"
+, "email" : "b@rubble.com"
+, "url" : "http://barnyrubble.tumblr.com/"
+}
+#+end_src
+
+Or you can shorten that all into a single string, and npm will parse it for
+you:
+
+: "Barney Rubble <b@rubble.com> (http://barnyrubble.tumblr.com/)"
+
+Both email and url are optional either way.
+
+#+cindex:@code{maintainers} field
+#+cindex:npm user info
+{{{command(npm)}}} also sets a top-level “maintainers” field with your npm user
+info.
+
+***** Files
+#+cindex:@code{files} field
+#+cindex:file patterns
+#+cindex:@file{.gitignore}
+#+cindex:glob patterns
+The optional files field is an array of file patterns that describes the
+entries to be included when your package is installed as a dependency.  File
+patterns follow a similar syntax to ~.gitignore~, but reversed: including a
+file, directory, or glob pattern (=*, **/*=, and such) will make it so that
+file is included in the tarball when it’s packed.  Omitting the field will make
+it default to ["*"], which means it will include all files.  Some special files
+and directories are also included or excluded regardless of whether they exist
+in the files array: Files included with the “package.json#files” field cannot
+be excluded through ~.npmignore~ or ~.gitignore~.
+
+#+cindex:@file{.npmignore} file
+You can also provide a ~.npmignore~ file in the root of your package or in
+subdirectories, which will keep files from being included.  At the root of your
+package it will not override the “files” field, but in subdirectories it will.
+The ~.npmignore~ file works just like a ~.gitignore~.  If there is a
+~.gitignore~ file, and ~.npmignore~ is missing, ~.gitignore~ ’s contents will
+be used instead.
+
+{{{heading(Files that are Always Included)}}}
+
+Certain files are always included, regardless of settings:
+
+- ~package.json~
+- ~README~
+- ~CHANGES / CHANGELOG / HISTORY~
+- ~LICENSE / LICENCE~
+- ~NOTICE~
+- The file in the =main= field
+
+
+=README=, =CHANGES=, =LICENSE= & =NOTICE= can have any case and extension.
+
+{{{heading(Files that are Always Ignored)}}}
+
+Some files are always ignored:
+
+- ~.git~
+- ~CVS~
+- ~.svn~
+- ~.hg~
+- ~.lock-wscript~
+- ~.wafpickle-N~
+- ~.*.swp~
+- ~.DS_Store~
+- ~._*~
+- ~npm-debug.log~
+- ~.npmrc~
+- ~node_modules~
+- ~config.gypi~
+- ~*.orig~
+- ~package-lock.json~ (use shrinkwrap instead)
+
+***** Main
+#+cindex:@code{main} field
+The =main= field is a module ID that is the primary entry point to your
+program.  That is, if your package is named =foo=, and a user installs it, and
+then does ~require("foo")~, then your main module’s =exports= object will be
+returned.
+
+This should be a module ID relative to the root of your package folder.
+
+For most modules, it makes the most sense to have a main script and often not
+much else.
+
+***** Browser
+#+cindex:@code{browser} field
+#+cindex:client-side
+If your module is meant to be used client-side the =browser= field should be
+used instead of the =main= field.  This is helpful to hint users that it might
+rely on primitives that aren’t available in Node.js modules. (e.g. window).
+
+***** Bin
+#+cindex:@code{bin} field
+#+cindex:executable files
+#+cindex:@code{PATH}
+A lot of packages have one or more executable files that they’d like to install
+into the {{{var(PATH)}}}.  {{{command(npm)}}} makes this pretty easy (in fact,
+it uses this feature to install the “npm” executable.)
+
+To use this, supply a =bin= field in your ~package.json~ which is a map of
+command name to local file name.  On install, {{{command(npm)}}} will symlink
+that file into ~prefix/bin~ for global installs, or ~./node_modules/.bin/~ for
+local installs.
+
+For example, myapp could have this:
+
+: { "bin" : { "myapp" : "./cli.js" } }
+
+So, when you install =myapp=, it’ll create a symlink from the ~cli.js~ script
+to ~/usr/local/bin/myapp~.
+
+#+cindex:script
+If you have a single executable, and its name should be the name of the
+package, then you can just supply it as a string.  For example:
+
+#+begin_src js
+{ "name": "my-program"
+, "version": "1.2.5"
+, "bin": "./path/to/program" }
+#+end_src
+
+would be the same as this:
+
+#+begin_src js
+{ "name": "my-program"
+, "version": "1.2.5"
+, "bin" : { "my-program" : "./path/to/program" } }
+#+end_src
+
+Make sure that your file(s) referenced in bin starts with ~#!/usr/bin/env
+node~, otherwise the scripts are started without the node executable!
 
 **** Shrinkwrap.json---A Publishable Lockfile
 
@@ -1236,6 +1444,7 @@ work under the hood, consult these resources:
 #+macro: command @@texinfo:@code{@@$1@@texinfo:}@@
 #+macro: noindent @@texinfo:@noindent @@
 #+macro: option @@texinfo:@option{@@$1@@texinfo:}@@
+#+macro: var @@texinfo:@option{@@$1@@texinfo:}@@
 
 * Local Variables                                                  :noexport:
 # Local Variables:
