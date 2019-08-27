@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-26 12:09
-#+macro: version Version 0.0.9
+#+date:2019-08-27 05:25
+#+macro: version Version 0.0.10
 
 * Babel
 ** Description
@@ -36,6 +36,39 @@ internally builds a *dependency graph* which maps every module your project
 needs and generates one or more bundles.  Since version 4.0.0,
 {{{command(webpack)}}} does not require a configuration file to bundle your
 project.
+
+** Guides
+*** Getting Started
+#+cindex:modules, compile
+#+cindex:compile modules
+{{{command(webpack)}}} is used to compile JavaScript modules.
+
+{{{noindent}}}You can interface with {{{command(webpack)}}} either from its CLI
+or API.
+
+**** Basic Setup
+Create a directory, initialize {{{command(npm)}}}, install
+{{{command(webpack)}}} locally, and install the {{{command(webpack-cli)}}}.
+
+#+caption:Webpack Basic Setup
+#+name:webpack-basic-setup
+#+header: :results output :exports results
+#+begin_src sh
+mkdir -p examples/guides/getting-started/webpack-demo
+cd examples/guides/getting-started/webpack-demo
+yarn init -yp
+yarn add --dev webpack webpack-cli
+#+end_src
+
+**** Package.json After Basic Setup
+
+{{{heading(Package.json)}}}
+
+#+name:show-package.json
+#+header: :results output :exports results
+#+begin_src sh :dir examples/guides/getting-started/webpack-demo
+cat package.json
+#+end_src
 
 ** WebPack Core Concepts
 #+cindex:core concepts
@@ -1121,6 +1154,8 @@ work under the hood, consult these resources:
 :unnumbered: t
 :index:    cp
 :END:
+* Export Settings
+#+options: H:4
 * Macro Definitions                                                :noexport:
 #+macro: heading @@texinfo:@heading@@ $1
 #+macro: subheading @@texinfo:@subheading@@ $1
