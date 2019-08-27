@@ -1,8 +1,82 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-27 05:25
-#+macro: version Version 0.0.10
+#+date:2019-08-27 05:55
+#+macro: version Version 0.0.11
+
+* NPM
+** About NPM
+** Getting Started
+** Packages and Modules
+** Integrations
+** Orgs
+** CLI Documentation
+*** CLI Commands
+*** Configuring NPM
+- [[https://docs.npmjs.com/cli-documentation/files][CLI Documentation->Configuring NPM]]
+
+**** Folder Structure Used by NPM
+
+**** NPMRC---The NPM Config Files
+
+**** Package-Lock.json---A Manifestation of the Manifest
+
+**** NPM-Package.json---Specifics of npm's package.json handling
+- [[https://docs.npmjs.com/files/package.json][Home Page]]
+
+All you need to know about what’s required in your ~package.json~ file.  It
+must be actual JSON.  A lot of the behavior described in this document is
+affected by the config settings described in [[*Using NPM][npm-config]].
+
+***** Name and Version
+If you plan to publish your package, the most important things in your
+~package.json~ are the =name= and =version= fields as they will be required.
+If you don’t plan to publish your package, the name and version fields are
+optional.
+
+The =name= and =version= together form an identifier that is assumed to be
+completely unique.  Changes to the package should come along with changes to
+the version.
+
+****** Name
+The name is what your thing is called.  Some rules:
+
+- The name must be less than or equal to 214 characters.  This includes the
+  scope for scoped packages.
+
+- The name can’t start with a dot or an underscore.
+
+- New packages must not have uppercase letters in the name.
+
+- The name ends up being part of a URL, an argument on the command line, and a
+  folder name.  Therefore, the name can’t contain any non-URL-safe characters.
+
+
+Some tips:
+
+- Don’t use the same name as a core Node module.
+
+- Don’t put “js” or “node” in the name.  It’s assumed that it’s ~js~, since
+  you’re writing a ~package.json~ file, and you can specify the engine using
+  the “engines” field.  (See below.)
+
+- The name will probably be passed as an argument to ~require()~, so it should
+  be something short, but also reasonably descriptive.
+
+- You may want to check the [[https://www.npmjs.com/][npm registry]] to see if there’s something by that
+  name already, before you get too attached to it.
+
+- A name can be optionally prefixed by a scope, e.g. ~@myorg/mypackage~.  See
+  [[https://docs.npmjs.com/misc/scope][npm-scope]] for more detail.
+
+****** Version
+Version must be parseable by {{{command(node-semver)}}}, which is bundled with
+{{{command(npm)}}} as a dependency.  (=npm install semver= to use it
+yourself.).  More on version numbers and ranges at [[https://docs.npmjs.com/misc/semver][semver]].
+
+**** Shrinkwrap.json---A Publishable Lockfile
+
+*** Using NPM
 
 * Babel
 ** Description
