@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-28 09:21
-#+macro: version Version 0.0.14
+#+date:2019-08-28 10:13
+#+macro: version Version 0.0.15
 
 * NPM
 ** About NPM
@@ -488,6 +488,32 @@ be loaded in the browser. Tweak the directory structure as follows:
 #+begin_src sh
 mkdir dist
 mv index.html dist
+#+end_src
+
+***** Adding lodash as a Dependency
+
+To bundle the {{{command(lodash)}}} dependency with ~index.js~, we'll need to
+install the library locally:
+
+#+caption:Install lodash locally
+#+name:install-lodash-locally
+#+header: :dir examples/guides/getting-started/webpack-demo
+#+header: :results output :exports both
+#+begin_src sh
+yarn add lodash
+#+end_src
+
+***** Import lodash into the Script File
+
+#+caption:Import lodash in index.js File
+#+name:import-lodash-in-index.js
+#+header: :dir examples/guides/getting-started/webpack-demo/src
+#+header: :results silent :exports both
+#+begin_src sh
+sed -i '' -e '1i \
+import _ from '"'"'lodash'"'"';\
+\
+' index.js
 #+end_src
 
 ** WebPack Core Concepts
