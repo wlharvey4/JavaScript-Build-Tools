@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-27 22:42
-#+macro: version Version 0.0.13
+#+date:2019-08-28 09:21
+#+macro: version Version 0.0.14
 
 * NPM
 ** About NPM
@@ -320,6 +320,12 @@ needs and generates one or more bundles.  Since version 4.0.0,
 project.
 
 ** Guides
+#+name:org-babel-tangle-file
+#+header: :results output :exports results
+#+begin_src emacs-lisp
+(org-babel-tangle-file "Build_Tools.org")
+#+end_src
+
 *** Getting Started
 #+cindex:modules, compile
 #+cindex:compile modules
@@ -329,20 +335,42 @@ project.
 or API.
 
 **** Basic Setup
-Create a directory, initialize {{{command(npm)}}}, install
-{{{command(webpack)}}} locally, and install the {{{command(webpack-cli)}}}.
+
+{{{heading(Install Webpack and Webpack CLI)}}}
+
+1. Create a project directory and move into it:
+
+   : mkdir examples/guides/getting-started/webpack-demo
+   : cd examples/guides/getting-started/webpack-demo
+
+2. Initialize {{{command(npm)}}}:
+   : yarn init --yes --private
+
+   The {{{option(--private)}}} option prevents the package from accidentally
+   being published.
+
+3. Install {{{command(webpack)}}} and {{{command(webpack-cli)}}} locally as
+   development dependencies:
+
+   : yarn add --dev webpack webpack-cli
+
 
 #+caption:Webpack Basic Setup
 #+name:webpack-basic-setup
+#+header: :dir examples/guides/getting-started/webpack-demo
 #+header: :results output :exports results
 #+begin_src sh
-mkdir -p examples/guides/getting-started/webpack-demo
-cd examples/guides/getting-started/webpack-demo
-yarn init -yp
-yarn add --dev webpack webpack-cli
+#mkdir -p examples/guides/getting-started/webpack-demo
+#cd examples/guides/getting-started/webpack-demo
+yarn init --yes --private
+yarn add webpack webpack-cli --dev
 #+end_src
 
-Now create the following directory structure, files and their contents:
+{{{heading(Create the Project Directory Structure)}}}
+
+Now create the following directory structure, files and their contents, i.e.,
+add a ~src~ directory for the project's ~index.js~ file, and add the project's
+root HTML file, ~index.html~:
 
 #+begin_example
 webpack-demo
@@ -352,12 +380,10 @@ webpack-demo
 +   |- index.js
 #+end_example
 
-{{{heading(Project)}}}
+{{{subheading(Add Project's src/index.js File)}}}
 
-{{{subheading(src/index.js)}}}
-
-#+caption:src/index.js
-#+name:src-index.js
+#+caption:Install src/index.js
+#+name:install-src-index.js
 #+header: :mkdirp yes
 #+begin_src js :tangle examples/guides/getting-started/webpack-demo/src/index.js
 function component() {
@@ -372,10 +398,11 @@ function component() {
 document.body.appendChild(component());
 #+end_src
 
-#+caption: index.html
-#+name:index.html
-#+header: :mkdirp yes
-#+begin_src js :tangle examples/guides/getting-started/webpack-demo/index.html
+{{{subheading(Add Project's index.html File)}}}
+
+#+caption: Install index.html
+#+name:install-index.html
+#+begin_src html :tangle examples/guides/getting-started/webpack-demo/index.html
 <!doctype html>
 <html>
   <head>
@@ -388,25 +415,79 @@ document.body.appendChild(component());
 </html>
 #+end_src
 
-**** Package.json After Basic Setup
+***** Package.json After Basic Setup
 
 {{{heading(Modify package.json)}}}
 
-Add a =private= property and remove the =main= entry.  A ~package.json~ file
-marked as =private= and without a =main= entry prevents accidental publication
-of the code.
+Remove the ~package.json~ file's =main= property:
 
 #+name:remove-the-main-entry
+#+header: :dir examples/guides/getting-started/webpack-demo
 #+header: :results output :exports results
-#+begin_src sh :dir examples/guides/getting-started/webpack-demo
-sed -i '' -e '/main/c\
-\ \ "private": true,' package.json
+#+begin_src sh
+sed -i '' -e '/main/d'
 #+end_src
 
+Let's look at what the ~package.json~ file looks like at this point:
+
 #+name:show-package.json
+#+header: :dir examples/guides/getting-started/webpack-demo
 #+header: :results output :exports results
-#+begin_src sh :dir examples/guides/getting-started/webpack-demo
+#+begin_src sh
 cat package.json
+#+end_src
+
+***** Implicit Dependencies
+
+#+cindex:dependencies, implicit
+In this example, there are implicit dependencies between the =<script>= tags.
+Our ~index.js~ file depends on {{{command(lodash)}}} being included in the page
+before it runs.  This is because ~index.js~ never explicitly declares a need
+for {{{command(lodash)}}}; it just assumes that the global variable ~_~ exists.
+
+There are problems with managing JavaScript projects this way:
+
+- It is not immediately apparent that the script depends on an external library.
+
+- If a dependency is missing, or included in the wrong order, the application
+  will not function properly.
+
+- If a dependency is included but not used, the browser will be forced to
+  download unnecessary code.
+
+
+Let's use {{{command(webpack)}}} to manage these scripts instead.
+
+**** Creating a Bundle
+#+cindex:directory structure
+#+cindex:source code directory @file{/src}
+#+cindex:@file{/src} directory
+#+cindex:distribution code directory @file{/dist}
+#+cindex:@file{/dist} directory
+First we'll tweak our directory structure slightly, separating the "source"
+code (~/src~) from our "distribution" code (~/dist~).  The {{{dfn(source)}}}
+code is the code that we'll write and edit.  The {{{dfn(distribution)}}} code
+is the minimized and optimized output of our build process that will eventually
+be loaded in the browser. Tweak the directory structure as follows:
+
+{{{heading(Project Directory Structure)}}}
+
+#+begin_example
+ webpack-demo
+  |- package.json
++ |- /dist
++   |- index.html
+- |- index.html
+  |- /src
+    |- index.js
+#+end_example
+
+#+name:tweak-project-directory-structure
+#+header: :dir examples/guides/getting-started/webpack-demo
+#+header: :results output :exports both
+#+begin_src sh
+mkdir dist
+mv index.html dist
 #+end_src
 
 ** WebPack Core Concepts
@@ -1502,6 +1583,7 @@ work under the hood, consult these resources:
 #+macro: noindent @@texinfo:@noindent @@
 #+macro: option @@texinfo:@option{@@$1@@texinfo:}@@
 #+macro: var @@texinfo:@option{@@$1@@texinfo:}@@
+#+macro: dfn @@texinfo:@dfn{@@$1@@texinfo:}@@
 
 * Local Variables                                                  :noexport:
 # Local Variables:
