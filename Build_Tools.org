@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-27 08:20
-#+macro: version Version 0.0.12
+#+date:2019-08-27 22:42
+#+macro: version Version 0.0.13
 
 * NPM
 ** About NPM
@@ -342,9 +342,66 @@ yarn init -yp
 yarn add --dev webpack webpack-cli
 #+end_src
 
+Now create the following directory structure, files and their contents:
+
+#+begin_example
+webpack-demo
+  |- package.json
++ |- index.html
++ |- /src
++   |- index.js
+#+end_example
+
+{{{heading(Project)}}}
+
+{{{subheading(src/index.js)}}}
+
+#+caption:src/index.js
+#+name:src-index.js
+#+header: :mkdirp yes
+#+begin_src js :tangle examples/guides/getting-started/webpack-demo/src/index.js
+function component() {
+  const element = document.createElement('div');
+
+  // Lodash, currently included via a script, is required for this line to work
+  element.innerHTML = _.join(['Hello', 'webpack'], ' ');
+
+  return element;
+}
+
+document.body.appendChild(component());
+#+end_src
+
+#+caption: index.html
+#+name:index.html
+#+header: :mkdirp yes
+#+begin_src js :tangle examples/guides/getting-started/webpack-demo/index.html
+<!doctype html>
+<html>
+  <head>
+    <title>Getting Started</title>
+    <script src="https://unpkg.com/lodash@4.16.6"></script>
+  </head>
+  <body>
+    <script src="./src/index.js"></script>
+  </body>
+</html>
+#+end_src
+
 **** Package.json After Basic Setup
 
-{{{heading(Package.json)}}}
+{{{heading(Modify package.json)}}}
+
+Add a =private= property and remove the =main= entry.  A ~package.json~ file
+marked as =private= and without a =main= entry prevents accidental publication
+of the code.
+
+#+name:remove-the-main-entry
+#+header: :results output :exports results
+#+begin_src sh :dir examples/guides/getting-started/webpack-demo
+sed -i '' -e '/main/c\
+\ \ "private": true,' package.json
+#+end_src
 
 #+name:show-package.json
 #+header: :results output :exports results
