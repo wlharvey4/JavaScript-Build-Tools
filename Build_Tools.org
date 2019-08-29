@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-08-28 10:13
-#+macro: version Version 0.0.15
+#+date:2019-08-29 07:16
+#+macro: version Version 0.0.16
 
 * NPM
 ** About NPM
@@ -1595,6 +1595,33 @@ work under the hood, consult these resources:
 - [[https://www.youtube.com/watch?v=Gc9-7PBqOC8][Live Coding a Simple Module Bundler]]
 
 - [[https://github.com/ronami/minipack][Detailed Explanation of a Simple Module Bundler]]
+* Gulp
+- [[https://gulpjs.com][Gulp Home]]
+
+{{{command(gulp)}}} is a toolkit for automating painful or time-consuming tasks
+in your development workflow, so you can stop messing around and build
+something.
+* Grunt
+- [[https://gruntjs.com][Gunt Home]]
+
+The JavaScript task runner.
+
+{{{heading(Why use a task runner?)}}}
+
+In one word: automation.  The less work you have to do when performing
+repetitive tasks like minification, compilation, unit testing, linting, etc,
+the easier your job becomes.  After you've configured it through a Gruntfile, a
+task runner can do most of that mundane work for you---and your team---with
+basically zero effort.
+
+{{{heading(Why use Grunt?)}}}
+
+The Grunt ecosystem is huge and it's growing every day.  With literally
+hundreds of plugins to choose from, you can use Grunt to automate just about
+anything with a minimum of effort.  If someone hasn't already built what you
+need, authoring and publishing your own Grunt plugin to npm is a breeze.  See
+how to get started.
+
 * Concept Index
 :PROPERTIES:
 :unnumbered: t
