@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-23 23:59
-#+macro: version Version 0.0.16
+#+date:2019-09-24 00:53
+#+macro: version Version 0.0.17
 
 * NPM
 ** About NPM
@@ -1624,6 +1624,283 @@ how to get started.
 
 * Mocha
 - https://mochajs.org
+- https://github.com/mochajs/mocha
+
+
+“a javascript test framework for node.js & the browser”
+
+#+cindex:Mocha test framework
+Mocha is a JavaScript test framework running on Node.js and in the browser.
+Mocha tests run serially, allowing for flexible and accurate reporting, while
+mapping uncaught exceptions to the correct test cases.  Mocha is an independent
+open-source project, maintained exclusively by volunteers.
+
+** Mocha Installation
+Install as a development dependency for a project:
+: $ npm install --save-dev mocha
+
+** Mocha Getting Started
+#+cindex:@code{test.js}
+Create a test file named ~test/test.js~:
+
+#+name:mocha-test.js
+#+begin_src js
+var assert = require('assert');
+describe('Array', function() {
+  describe('#indexOf()', function() {
+    it('should return -1 when the value is not present', function() {
+      assert.equal([1, 2, 3].indexOf(4), -1);
+    });
+  });
+});
+#+end_src
+
+{{{heading(From the command-line)}}}
+
+: $ ./node_modules/mocha/bin/mocha
+
+{{{noindent}}}with output:
+
+#+begin_example
+Array
+    #indexOf()
+      ✓ should return -1 when the value is not present
+
+
+1 passing (9ms)
+#+end_example
+
+{{{heading(Set up a test script in ‘package.json’)}}}
+
+#+begin_src js
+"scripts": {
+  "test": "mocha"
+}
+#+end_src
+
+{{{noindent}}}and run with:
+
+: $ npm test
+
+** Mocha Assertion Libraries
+#+cindex:assertion libraries
+Mocha allows you to use any assertion library you wish---generally, if it
+throws an =Error=, it will work!  This means you can use libraries such as:
+
+- [[https://www.chaijs.com/][chai]]
+
+- [[https://github.com/shouldjs/should.js][should.js]]
+
+- [[https://github.com/LearnBoost/expect.js][expect.js]]
+
+- [[https://github.com/visionmedia/better-assert][better-assert]]
+
+- [[https://unexpected.js.org/][unexpected]]
+
+** Mocha and Testing Asynchronous Code
+Simply invoke the callback when your test is complete.  By adding a callback
+(usually named ~done~) to ~it()~, Mocha will know that it should wait for this
+function to be called to complete the test.  This callback accepts both an
+=Error= instance (or subclass thereof) or a =falsy= value; anything else will
+cause a failed test.
+
+#+name:Mocha-asynchronous-test
+#+begin_src js -n
+describe('User', function() {
+  describe('#save()', function() {
+    it('should save without error', function(done) {
+      var user = new User('Luna');
+      user.save(function(err) {
+        if (err) done(err); // <==== Error
+        else done();        // <==== calling done()
+      });
+    });
+  });
+});
+#+end_src
+
+Alternatively, just use the ~done()~ callback directly (which will handle an
+error argument, if it exists):
+
+#+name:Mocha-asynchronous-test-done-directly
+#+begin_src js -n
+describe('User', function() {
+  describe('#save()', function() {
+    it('should save without error', function(done) {
+      var user = new User('Luna');
+      user.save(done);
+    });
+  });
+});
+#+end_src
+
+{{{heading(Promises)}}}
+
+Instead of using the ~done()~ callback, you may return a Promise.  This is
+useful if the APIs you are testing return promises instead of taking callbacks:
+
+#+name:Mocha-promises
+#+begin_src js -n
+beforeEach(function() {
+  return db.clear().then(function() {
+    return db.save([tobi, loki, jane]);
+  });
+});
+
+describe('#find()', function() {
+  it('respond with matching records', function() {
+    return db.find({type: 'User'}).should.eventually.have.length(3);
+  });
+});
+#+end_src
+
+{{{heading(Async Await)}}}
+
+If your JS environment supports =async / await=, you can also write
+asynchronous tests like this:
+
+#+begin_src js -n
+beforeEach(async function() {
+  await db.clear();
+  await db.save([tobi, loki, jane]);
+});
+
+describe('#find()', function() {
+  it('responds with matching records', async function() {
+    const users = await db.find({type: 'User'});
+    users.should.have.length(3);
+  });
+});
+#+end_src
+
+** Mocha and Testing Synchronous Code
+When testing synchronous code, omit the callback and Mocha will automatically
+continue on to the next test.
+
+#+name:Mocha-synchronous-code
+#+begin_src js -n
+describe('Array', function() {
+  describe('#indexOf()', function() {
+    it('should return -1 when the value is not present', function() {
+      [1, 2, 3].indexOf(5).should.equal(-1);
+      [1, 2, 3].indexOf(0).should.equal(-1);
+    });
+  });
+});
+#+end_src
+
+** Mocha Hooks
+With its default “BDD”-style interface, Mocha provides the hooks:
+
+- ~before()~
+
+- ~after()~
+
+- ~beforeEach()~
+
+- ~afterEach()~
+
+
+These should be used to set up preconditions and clean up after your tests:
+
+#+name:Mocha-hooks
+#+begin_src js -n
+describe('hooks', function() {
+  before(function() {
+    // runs before all tests in this block
+  });
+
+  after(function() {
+    // runs after all tests in this block
+  });
+
+  beforeEach(function() {
+    // runs before each test in this block
+  });
+
+  afterEach(function() {
+    // runs after each test in this block
+  });
+
+  // test cases
+});
+#+end_src
+
+Tests can appear before, after, or interspersed with your hooks.  Hooks will
+run in the order they are defined, as appropriate; all ~before()~ hooks run
+(once), then any ~beforeEach()~ hooks, tests, any ~afterEach()~ hooks, and
+finally ~after()~ hooks (once).
+
+{{{heading(Describing Hooks)}}}
+
+Any hook can be invoked with an optional description, making it easier to
+pinpoint errors in your tests.  If a hook is given a named function, that name
+will be used if no description is supplied.
+
+#+name:Mocha-describe-hooks
+#+begin_src js -n
+beforeEach(function() {
+  // beforeEach hook
+});
+
+beforeEach(function namedFun() {
+  // beforeEach:namedFun
+});
+
+beforeEach('some description', function() {
+  // beforeEach:some description
+});
+#+end_src
+
+*** Asynchronous Hooks
+All hooks (~before()~, ~after()~, ~beforeEach()~, ~afterEach()~) may be sync or
+async as well, behaving much like a regular test-case.  For example, you may
+wish to populate database with dummy content before each test:
+
+#+name:Mocha-asynchronous-tests
+#+begin_src js -n
+describe('Connection', function() {
+  var db = new Connection(),
+    tobi = new User('tobi'),
+    loki = new User('loki'),
+    jane = new User('jane');
+
+  beforeEach(function(done) {
+    db.clear(function(err) {
+      if (err) return done(err);
+      db.save([tobi, loki, jane], done);
+    });
+  });
+
+  describe('#find()', function() {
+    it('respond with matching records', function(done) {
+      db.find({type: 'User'}, function(err, res) {
+        if (err) return done(err);
+        res.should.have.length(3);
+        done();
+      });
+    });
+  });
+});
+#+end_src
+
+*** Mocha Root Level Hooks
+You may also pick any file and add “root”-level hooks.  For example, add
+~beforeEach()~ outside of all ~describe()~ blocks.  This will cause the
+callback to ~beforeEach()~ to run before any test case, regardless of the file
+it lives in (this is because Mocha has an implied ~describe()~ block, called
+the “root suite”).
+
+#+name:Mocha-root-level-hook
+#+begin_src js -n
+beforeEach(function() {
+  console.log('before every test in every file');
+});
+#+end_src
+
+* Chai
+- https://www.chaijs.com
+
 * Concept Index
 :PROPERTIES:
 :unnumbered: t
@@ -1645,4 +1922,5 @@ how to get started.
 # fill-column:79
 # time-stamp-pattern:"8/^\\#\\+date:%:y-%02m-%02d %02H:%02M$"
 # eval: (org-indent-mode)
+# eval: (electric-quote-local-mode)
 # End:
