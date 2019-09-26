@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-26 08:43
-#+macro: version Version 0.0.18
+#+date:2019-09-26 11:24
+#+macro: version Version 0.0.19
 
 * NPM
 ** About NPM
@@ -1845,6 +1845,855 @@ module.exports = {
 Because TypeScript support in Babel is just transpilation, Jest will not
 type-check your tests as they are ran.  If you want that, you can use [[https://github.com/kulshekhar/ts-jest][ts-jest]].
 
+*** Jest Matchers
+Jest uses "matchers" to let you test values in different ways.  This document
+will introduce some commonly used matchers.
+
+**** Common Matchers
+The simplest way to test a value is with exact equality.
+
+#+caption:Testing for exact equality
+#+name:test-for-exact-equality
+#+begin_src js -n
+test('two plus two is four', () => {
+  expect(2 + 2).toBe(4);
+});
+#+end_src
+
+In this code, ~expect(2 + 2)~ returns an "expectation" object.  You typically
+won't do much with these expectation objects except call matchers on them.  In
+this code, ~.toBe(4)~ is the matcher.  When Jest runs, it tracks all the
+failing matchers so that it can print out nice error messages for you.
+
+~toBe~ uses ~Object.is~ to test exact equality.  If you want to check the value
+of an object, use ~toEqual~ instead:
+
+#+caption:Testing the value of an object
+#+name:test-value-of-object
+#+begin_src js -n
+test('object assignment', () => {
+  const data = {one: 1};
+  data['two'] = 2;
+  expect(data).toEqual({one: 1, two: 2});
+});
+#+end_src
+
+~toEqual~ recursively checks every field of an object or array.
+
+You can also test for the opposite of a matcher:
+
+#+caption:Testing the opposite of a matcher
+#+name:test-the-opposite
+#+begin_src js -n
+test('adding positive numbers is not zero', () => {
+  for (let a = 1; a < 10; a++) {
+    for (let b = 1; b < 10; b++) {
+      expect(a + b).not.toBe(0);
+    }
+  }
+});
+#+end_src
+
+**** Truthiness
+In tests you sometimes need to distinguish between =undefined=, =null=, and
+=false=, but you sometimes do not want to treat these differently.  Jest
+contains helpers that let you be explicit about what you want.
+
+- =toBeNull= matches only =null=
+
+- =toBeUndefined= matches only =undefined=
+
+- =toBeDefined= is the opposite of =toBeUndefined=
+
+- =toBeTruthy= matches anything that an =if= statement treats as =true=
+
+- =toBeFalsy= matches anything that an =if= statement treats as =false=
+
+
+#+caption:Testing truthiness
+#+name:testing-truthiness
+#+begin_src js -n
+test('null', () => {
+  const n = null;
+  expect(n).toBeNull();
+  expect(n).toBeDefined();
+  expect(n).not.toBeUndefined();
+  expect(n).not.toBeTruthy();
+  expect(n).toBeFalsy();
+});
+
+test('zero', () => {
+  const z = 0;
+  expect(z).not.toBeNull();
+  expect(z).toBeDefined();
+  expect(z).not.toBeUndefined();
+  expect(z).not.toBeTruthy();
+  expect(z).toBeFalsy();
+});
+#+end_src
+
+You should use the matcher that most precisely corresponds to what you want
+your code to be doing.
+
+**** Numbers
+Most ways of comparing numbers have matcher equivalents.
+
+#+caption:Testing Numbers
+#+name:testing-numbers
+#+begin_src js -n
+test('two plus two', () => {
+  const value = 2 + 2;
+  expect(value).toBeGreaterThan(3);
+  expect(value).toBeGreaterThanOrEqual(3.5);
+  expect(value).toBeLessThan(5);
+  expect(value).toBeLessThanOrEqual(4.5);
+
+  // toBe and toEqual are equivalent for numbers
+  expect(value).toBe(4);
+  expect(value).toEqual(4);
+});
+#+end_src
+
+{{{subheading(Testing Floating Point Numbers)}}}
+
+For floating point equality, use ~toBeCloseTo~ instead of ~toEqual~, because
+you don't want a test to depend on a tiny rounding error.
+
+#+caption:Testing Floating Point Numbers
+#+name:test-floating-point-numbers
+#+begin_src js -n
+test('adding floating point numbers', () => {
+  const value = 0.1 + 0.2;
+  //expect(value).toBe(0.3);           This won't work because of rounding error
+  expect(value).toBeCloseTo(0.3); // This works.
+});
+#+end_src
+
+**** Strings
+You can check strings against regular expressions with ~toMatch~:
+
+#+caption:Testing Strings
+#+name:test-strings
+#+begin_src js -n
+test('there is no I in team', () => {
+  expect('team').not.toMatch(/I/);
+});
+
+test('but there is a "stop" in Christoph', () => {
+  expect('Christoph').toMatch(/stop/);
+});
+#+end_src
+
+**** Arrays and Iterables
+You can check if an array or iterable contains a particular item using
+~toContain~:
+
+#+caption:Testing Arrays and Iterables
+#+name:test-arrays-and-iterables
+#+begin_src js -n
+const shoppingList = [
+  'diapers',
+  'kleenex',
+  'trash bags',
+  'paper towels',
+  'beer',
+];
+
+test('the shopping list has beer on it', () => {
+  expect(shoppingList).toContain('beer');
+  expect(new Set(shoppingList)).toContain('beer');
+});
+#+end_src
+
+**** Exceptions
+If you want to test that a particular function throws an error when it's
+called, use ~toThrow~.
+
+#+caption:Testing Exceptions
+#+name:test-exceptions
+#+begin_src js -n
+function compileAndroidCode() {
+  throw new Error('you are using the wrong JDK');
+}
+
+test('compiling android goes as expected', () => {
+  expect(compileAndroidCode).toThrow();
+  expect(compileAndroidCode).toThrow(Error);
+
+  // You can also use the exact error message or a regexp
+  expect(compileAndroidCode).toThrow('you are using the wrong JDK');
+  expect(compileAndroidCode).toThrow(/JDK/);
+});
+#+end_src
+
+*** Testing Asynchronous Code
+It's common in JavaScript for code to run asynchronously.  When you have code
+that runs asynchronously, Jest needs to know when the code it is testing has
+completed, before it can move on to another test.  Jest has several ways to
+handle this.
+
+**** Callbacks
+The most common asynchronous pattern is callbacks.
+
+For example, let's say that you have a ~fetchData(callback)~ function that
+fetches some data and calls ~callback(data)~ when it is complete.  You want to
+test that this returned data is just the string 'peanut butter'.
+
+Instead of putting the test in a function with an empty argument, use a single
+argument called =done=.  Jest will wait until the =done= callback is called
+before finishing the test.
+
+#+caption:Demonstrating asynchronouse testing with =done=
+#+name:test-asynchronous-code-with-done
+#+begin_src js -n
+// Don't do this!
+test('the data is peanut butter', () => {
+  function callback(data) {
+    expect(data).toBe('peanut butter');
+  }
+
+  fetchData(callback);
+});
+
+// Do this!
+test('the data is peanut butter', done => {
+  function callback(data) {
+    expect(data).toBe('peanut butter');
+    done();
+  }
+
+  fetchData(callback);
+});
+#+end_src
+
+If ~done()~ is never called, the test will fail, which is what you want to
+happen.
+
+**** Promises
+If your code uses promises, there is a simpler way to handle asynchronous
+tests.  Just return a promise from your test, and Jest will wait for that
+promise to resolve.  If the promise is rejected, the test will automatically
+fail.
+
+For example, let's say that ~fetchData~, instead of using a callback, returns a
+promise that is supposed to resolve to the string 'peanut butter'.  We could
+test it with:
+
+#+caption:Testing asynchronous code with promises
+#+name:test-asynchronous-code-with-promises
+#+begin_src js -n
+test('the data is peanut butter', () => {
+  return fetchData().then(data => {
+    expect(data).toBe('peanut butter');
+  });
+});
+#+end_src
+
+Be sure to return the promise --- if you omit this ~return~ statement, your
+test will complete before the promise returned from ~fetchData~ resolves and
+~then()~ has a chance to execute the callback.
+
+If you expect a promise to be rejected use the ~.catch~ method.  Make sure to
+add ~expect.assertions~ to verify that a certain number of assertions are
+called.  Otherwise a fulfilled promise would not fail the test.
+
+#+caption:Testing asynchronous code with promises and catch
+#+name:test-asynchronous-code-with-promises-and-catch
+#+begin_src js -n
+test('the fetch fails with an error', () => {
+  expect.assertions(1);
+  return fetchData().catch(e => expect(e).toMatch('error'));
+});
+#+end_src
+
+{{{heading(Using ~.resolves~ and ~.rejects~)}}}
+
+You can also use the ~.resolves~ matcher in your =expect= statement, and Jest
+will wait for that promise to resolve.  If the promise is rejected, the test
+will automatically fail.
+
+#+caption:Testing asynchronous code with ~.resolves~
+#+name:test-asynchronous-code-with-.resolves
+#+begin_src js -n
+test('the data is peanut butter', () => {
+  return expect(fetchData()).resolves.toBe('peanut butter');
+});
+#+end_src
+
+Be sure to return the assertion---if you omit this ~return~ statement, your
+test will complete before the promise returned from ~fetchData~ is resolved and
+~then()~ has a chance to execute the callback.
+
+If you expect a promise to be rejected use the ~.rejects~ matcher.  It works
+analogically to the ~.resolves~ matcher.  If the promise is fulfilled, the test
+will automatically fail.
+
+#+caption:Testing asynchronous code using ~.rejects~
+#+name:test-asynchronous-code-using-.rejects
+#+begin_src js -n
+test('the fetch fails with an error', () => {
+  return expect(fetchData()).rejects.toMatch('error');
+});
+#+end_src
+
+**** Async-Await
+Alternatively, you can use =async= and =await= in your tests.  To write an
+=async= test, just use the =async= keyword in front of the function passed to
+test.  For example, the same ~fetchData~ scenario can be tested with:
+
+#+caption:Testing asynchronous code using async/await
+#+name:test-asynchronous-code-using-async-await
+#+begin_src js -n
+test('the data is peanut butter', async () => {
+  const data = await fetchData();
+  expect(data).toBe('peanut butter');
+});
+
+test('the fetch fails with an error', async () => {
+  expect.assertions(1);
+  try {
+    await fetchData();
+  } catch (e) {
+    expect(e).toMatch('error');
+  }
+});
+#+end_src
+
+You can combine =async= and =await= with ~.resolves~ or ~.rejects~.
+
+#+caption:Testing asynchronous code using both async/await and .resolves/.rejects
+#+name:test-asynchronous-code-using-both
+#+begin_src js -n
+test('the data is peanut butter', async () => {
+  await expect(fetchData()).resolves.toBe('peanut butter');
+});
+
+test('the fetch fails with an error', async () => {
+  await expect(fetchData()).rejects.toThrow('error');
+});
+#+end_src
+
+In these cases, =async= and =await= are effectively just syntactic sugar for
+the same logic as the promises example uses.
+
+None of these forms is particularly superior to the others, and you can mix and
+match them across a codebase or even in a single file.  It just depends on
+which style makes your tests simpler.
+
+*** Setup and Teardown
+Often while writing tests you have some setup work that needs to happen before
+tests run, and you have some finishing work that needs to happen after tests
+run.  Jest provides helper functions to handle this.
+
+**** Repeating Setup For Many Tests
+If you have some work you need to do repeatedly for many tests, you can use
+~beforeEach~ and ~afterEach~.
+
+For example, let's say that several tests interact with a database of
+cities. You have a method ~initializeCityDatabase()~ that must be called before
+each of these tests, and a method ~clearCityDatabase()~ that must be called
+after each of these tests.  You can do this with:
+
+#+caption:Setting up before many tests
+#+name:setting-up-beforfe-many-tests
+#+begin_src js -n
+beforeEach(() => {
+  initializeCityDatabase();
+});
+
+afterEach(() => {
+  clearCityDatabase();
+});
+
+test('city database has Vienna', () => {
+  expect(isCity('Vienna')).toBeTruthy();
+});
+
+test('city database has San Juan', () => {
+  expect(isCity('San Juan')).toBeTruthy();
+});
+#+end_src
+
+~beforeEach~ and ~afterEach~ can handle asynchronous code in the same ways that
+tests can handle asynchronous code --- they can either take a =done= parameter
+or return a promise.  For example, if ~initializeCityDatabase()~ returned a
+promise that resolved when the database was initialized, we would want to
+return that promise:
+
+#+caption:Asynchronous setting up
+#+name:asynchronous-setting-up
+#+begin_src js -n
+beforeEach(() => {
+  return initializeCityDatabase();
+});
+#+end_src
+
+**** One-Time Setup
+In some cases, you only need to do setup once, at the beginning of a file.
+This can be especially bothersome when the setup is asynchronous, so you can't
+just do it inline.  Jest provides ~beforeAll~ and ~afterAll~ to handle this
+situation.
+
+For example, if both ~initializeCityDatabase~ and ~clearCityDatabase~ returned
+promises, and the city database could be reused between tests, we could change
+our test code to:
+
+#+caption:One-Time setup
+#+name:one-time-setup
+#+begin_src js -n
+beforeAll(() => {
+  return initializeCityDatabase();
+});
+
+afterAll(() => {
+  return clearCityDatabase();
+});
+
+test('city database has Vienna', () => {
+  expect(isCity('Vienna')).toBeTruthy();
+});
+
+test('city database has San Juan', () => {
+  expect(isCity('San Juan')).toBeTruthy();
+});
+#+end_src
+
+**** Scoping
+By default, the =before= and =after= blocks apply to every test in a file.  You
+can also group tests together using a =describe= block.  When they are inside a
+=describe= block, the =before= and =after= blocks only apply to the tests
+within that =describe= block.
+
+For example, let's say we had not just a city database, but also a food
+database.  We could do different setup for different tests:
+
+#+caption:Example of scoping different test blocks
+#+name:scoping-example
+#+begin_src js -n
+// Applies to all tests in this file
+beforeEach(() => {
+  return initializeCityDatabase();
+});
+
+test('city database has Vienna', () => {
+  expect(isCity('Vienna')).toBeTruthy();
+});
+
+test('city database has San Juan', () => {
+  expect(isCity('San Juan')).toBeTruthy();
+});
+
+describe('matching cities to foods', () => {
+  // Applies only to tests in this describe block
+  beforeEach(() => {
+    return initializeFoodDatabase();
+  });
+
+  test('Vienna <3 sausage', () => {
+    expect(isValidCityFoodPair('Vienna', 'Wiener Schnitzel')).toBe(true);
+  });
+
+  test('San Juan <3 plantains', () => {
+    expect(isValidCityFoodPair('San Juan', 'Mofongo')).toBe(true);
+  });
+});
+#+end_src
+
+Note that the top-level =beforeEach= is executed before the =beforeEach= inside
+the =describe= block.  It may help to illustrate the order of execution of all
+hooks.
+
+#+caption:Order of execution
+#+name:order-of-execution
+#+begin_example
+beforeAll(() => console.log('1 - beforeAll'));
+afterAll(() => console.log('1 - afterAll'));
+beforeEach(() => console.log('1 - beforeEach'));
+afterEach(() => console.log('1 - afterEach'));
+test('', () => console.log('1 - test'));
+describe('Scoped / Nested block', () => {
+  beforeAll(() => console.log('2 - beforeAll'));
+  afterAll(() => console.log('2 - afterAll'));
+  beforeEach(() => console.log('2 - beforeEach'));
+  afterEach(() => console.log('2 - afterEach'));
+  test('', () => console.log('2 - test'));
+});
+
+// 1 - beforeAll
+// 1 - beforeEach
+// 1 - test
+// 1 - afterEach
+// 2 - beforeAll
+// 1 - beforeEach
+// 2 - beforeEach
+// 2 - test
+// 2 - afterEach
+// 1 - afterEach
+// 2 - afterAll
+// 1 - afterAll
+#+end_example
+
+**** Order of execution of describe and test blocks
+Jest executes all =describe= handlers in a test file before it executes any of
+the actual tests.  This is another reason to do setup and teardown inside
+=before*= and =after*= handlers rather than inside the =describe= blocks.  Once
+the =describe= blocks are complete, by default Jest runs all the tests serially
+in the order they were encountered in the collection phase, waiting for each to
+finish and be tidied up before moving on.
+
+Consider the following illustrative test file and output:
+
+#+caption:Demonstration of order of execution
+#+name:demonstrate-order-of-executiuon
+#+begin_src js -n
+describe('outer', () => {
+  console.log('describe outer-a');
+
+  describe('describe inner 1', () => {
+    console.log('describe inner 1');
+    test('test 1', () => {
+      console.log('test for describe inner 1');
+      expect(true).toEqual(true);
+    });
+  });
+
+  console.log('describe outer-b');
+
+  test('test 1', () => {
+    console.log('test for describe outer');
+    expect(true).toEqual(true);
+  });
+
+  describe('describe inner 2', () => {
+    console.log('describe inner 2');
+    test('test for describe inner 2', () => {
+      console.log('test for describe inner 2');
+      expect(false).toEqual(false);
+    });
+  });
+
+  console.log('describe outer-c');
+});
+
+// describe outer-a
+// describe inner 1
+// describe outer-b
+// describe inner 2
+// describe outer-c
+// test for describe inner 1
+// test for describe outer
+// test for describe inner 2
+#+end_src
+
+**** General Advice
+If a test is failing, one of the first things to check should be whether the
+test is failing when it's the only test that runs.  In Jest it's simple to run
+only one test --- just temporarily change that test command to a ~test.only~:
+
+#+caption:Run only one test
+#+name:run-test-only
+#+begin_src js -n
+test.only('this will be the only test that runs', () => {
+  expect(true).toBe(false);
+});
+
+test('this test will not run', () => {
+  expect('A').toBe('A');
+});
+#+end_src
+
+If you have a test that often fails when it's run as part of a larger suite,
+but doesn't fail when you run it alone, it's a good bet that something from a
+different test is interfering with this one.  You can often fix this by
+clearing some shared state with =beforeEach=.  If you're not sure whether some
+shared state is being modified, you can also try a =beforeEach= that just logs
+data.
+
+*** Mock Functions
+Mock functions make it easy to test the links between code by erasing the
+actual implementation of a function, capturing calls to the function (and the
+parameters passed in those calls), capturing instances of constructor functions
+when instantiated with =new=, and allowing test-time configuration of return
+values.
+
+There are two ways to mock functions: Either by creating a mock function to use
+in test code, or writing a manual mock to override a module dependency.
+
+**** Using a mock function
+Let's imagine we're testing an implementation of a function ~forEach~, which
+invokes a callback for each item in a supplied array.
+
+#+caption:ForEach implementation
+#+name:foreach-implementation
+#+begin_src js -n
+function forEach(items, callback) {
+  for (let index = 0; index < items.length; index++) {
+    callback(items[index]);
+  }
+}
+#+end_src
+
+To test this function, we can use a mock function, and inspect the mock's state
+to ensure the callback is invoked as expected.
+
+#+caption:Test forEach function with a moch function
+#+name:test-foreach-with-mock-function
+#+begin_src js -n
+const mockCallback = jest.fn(x => 42 + x);
+forEach([0, 1], mockCallback);
+
+// The mock function is called twice
+expect(mockCallback.mock.calls.length).toBe(2);
+
+// The first argument of the first call to the function was 0
+expect(mockCallback.mock.calls[0][0]).toBe(0);
+
+// The first argument of the second call to the function was 1
+expect(mockCallback.mock.calls[1][0]).toBe(1);
+
+// The return value of the first call to the function was 42
+expect(mockCallback.mock.results[0].value).toBe(42);
+#+end_src
+
+**** .mock property
+All mock functions have this special ~.mock~ property, which is where data
+about how the function has been called and what the function returned is kept.
+The ~.mock~ property also tracks the value of this for each call, so it is
+possible to inspect this as well:
+
+#+caption:Mock test using .mock property
+#+name:mock-test-using-.mock-property
+#+begin_src js -n
+const myMock = jest.fn();
+
+const a = new myMock();
+const b = {};
+const bound = myMock.bind(b);
+bound();
+
+console.log(myMock.mock.instances);
+// > [ <a>, <b> ]
+#+end_src
+
+These mock members are very useful in tests to assert how these functions get
+called, instantiated, or what they returned:
+
+#+caption:Mock members
+#+name:mock-members
+#+begin_src js -n
+// The function was called exactly once
+expect(someMockFunction.mock.calls.length).toBe(1);
+
+// The first arg of the first call to the function was 'first arg'
+expect(someMockFunction.mock.calls[0][0]).toBe('first arg');
+
+// The second arg of the first call to the function was 'second arg'
+expect(someMockFunction.mock.calls[0][1]).toBe('second arg');
+
+// The return value of the first call to the function was 'return value'
+expect(someMockFunction.mock.results[0].value).toBe('return value');
+
+// This function was instantiated exactly twice
+expect(someMockFunction.mock.instances.length).toBe(2);
+
+// The object returned by the first instantiation of this function
+// had a `name` property whose value was set to 'test'
+expect(someMockFunction.mock.instances[0].name).toEqual('test');
+#+end_src
+
+**** Mock Return Values
+Mock functions can also be used to inject test values into your code during a
+test:
+
+#+caption:Using mock functions to inject test values
+#+name:inject-test-values
+#+begin_src js -n
+const myMock = jest.fn();
+console.log(myMock());
+// > undefined
+
+myMock
+  .mockReturnValueOnce(10)
+  .mockReturnValueOnce('x')
+  .mockReturnValue(true);
+
+console.log(myMock(), myMock(), myMock(), myMock());
+// > 10, 'x', true, true
+#+end_src
+
+Mock functions are also very effective in code that uses a functional
+continuation-passing style.  Code written in this style helps avoid the need
+for complicated stubs that recreate the behavior of the real component they're
+standing in for, in favor of injecting values directly into the test right
+before they're used.
+
+#+caption:Using mock functions for continuation-passing
+#+name:mock-functions-continuation-style
+#+begin_src js -n
+const filterTestFn = jest.fn();
+
+// Make the mock return `true` for the first call,
+// and `false` for the second call
+filterTestFn.mockReturnValueOnce(true).mockReturnValueOnce(false);
+
+const result = [11, 12].filter(filterTestFn);
+
+console.log(result);
+// > [11]
+console.log(filterTestFn.mock.calls);
+// > [ [11], [12] ]
+#+end_src
+
+Most real-world examples actually involve getting ahold of a mock function on a
+dependent component and configuring that, but the technique is the same.  In
+these cases, try to avoid the temptation to implement logic inside of any
+function that's not directly being tested.
+
+**** Mocking Modules
+Suppose we have a class that fetches users from our API.  The class uses
+~axios~ to call the API then returns the data attribute which contains all the
+users:
+
+#+caption:A module using axios
+#+name:module-using-axios
+#+begin_src js -n
+// users.js
+import axios from 'axios';
+
+class Users {
+  static all() {
+    return axios.get('/users.json').then(resp => resp.data);
+  }
+}
+
+export default Users;
+#+end_src
+
+Now, in order to test this method without actually hitting the API (and thus
+creating slow and fragile tests), we can use the ~jest.mock(...)~ function to
+automatically mock the ~axios~ module.
+
+Once we mock the module we can provide a ~mockResolvedValue~ for ~.get~ that
+returns the data we want our test to assert against.  In effect, we are saying
+that we want ~axios.get('/users.json')~ to return a fake response.
+
+#+caption:Mocking a module
+#+name:mock-a-module
+#+begin_src js -n
+// users.test.js
+import axios from 'axios';
+import Users from './users';
+
+jest.mock('axios');
+
+test('should fetch users', () => {
+  const users = [{name: 'Bob'}];
+  const resp = {data: users};
+  axios.get.mockResolvedValue(resp);
+
+  // or you could use the following depending on your use case:
+  // axios.get.mockImplementation(() => Promise.resolve(resp))
+
+  return Users.all().then(data => expect(data).toEqual(users));
+});
+#+end_src
+
+**** Mock Implementations
+Still, there are cases where it's useful to go beyond the ability to specify
+return values and full-on replace the implementation of a mock function.  This
+can be done with ~jest.fn~ or the ~mockImplementationOnce~ method on mock
+functions.
+
+...
+
+**** Mock Names
+You can optionally provide a name for your mock functions, which will be
+displayed instead of "jest.fn()" in test error output.  Use this if you want to
+be able to quickly identify the mock function reporting an error in your test
+output.
+
+#+caption:Mock names
+#+name:moch-names
+#+begin_src js -n
+const myMockFn = jest
+  .fn()
+  .mockReturnValue('default')
+  .mockImplementation(scalar => 42 + scalar)
+  .mockName('add42');
+#+end_src
+
+**** Custom Matchers
+Finally, in order to make it simpler to assert how mock functions have been
+called, we've added some custom matcher functions for you:
+
+#+caption:Custom matcher functions
+#+name:custom-matcher-functions
+#+begin_src js -n
+// The mock function was called at least once
+expect(mockFunc).toBeCalled();
+
+// The mock function was called at least once with the specified args
+expect(mockFunc).toBeCalledWith(arg1, arg2);
+
+// The last call to the mock function was called with the specified args
+expect(mockFunc).lastCalledWith(arg1, arg2);
+
+// All calls and the name of the mock is written as a snapshot
+expect(mockFunc).toMatchSnapshot();
+#+end_src
+
+These matchers are really just sugar for common forms of inspecting the ~.mock~
+property.  You can always do this manually yourself if that's more to your
+taste or if you need to do something more specific:
+
+#+caption:Inspecting .mock property manually
+#+name:inspect-mock-property-manually
+#+begin_src js -n
+// The mock function was called at least once
+expect(mockFunc.mock.calls.length).toBeGreaterThan(0);
+
+// The mock function was called at least once with the specified args
+expect(mockFunc.mock.calls).toContainEqual([arg1, arg2]);
+
+// The last call to the mock function was called with the specified args
+expect(mockFunc.mock.calls[mockFunc.mock.calls.length - 1]).toEqual([
+  arg1,
+  arg2,
+]);
+
+// The first arg of the last call to the mock function was `42`
+// (note that there is no sugar helper for this specific of an assertion)
+expect(mockFunc.mock.calls[mockFunc.mock.calls.length - 1][0]).toBe(42);
+
+// A snapshot will check that a mock was invoked the same number of times,
+// in the same order, with the same arguments. It will also assert on the name.
+expect(mockFunc.mock.calls).toEqual([[arg1, arg2]]);
+expect(mockFunc.getMockName()).toBe('a mock name');
+#+end_src
+
+*** Jest Platform
+You can cherry pick specific features of Jest and use them as standalone
+packages. Here's a list of the available packages:
+
+**** jest-changed-files
+
+**** jest-diff
+
+**** jest-docblock
+
+**** jest-get-type
+
+**** jest-validate
+
+**** jest-worker
+
+**** pretty-format
+
+** Jest Guides
+
+** Jest Framework Guides
+
+** Jest API Reference
 * mocha
 - https://mochajs.org
 - https://github.com/mochajs/mocha
