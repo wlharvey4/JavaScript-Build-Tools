@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-24 00:53
-#+macro: version Version 0.0.17
+#+date:2019-09-26 08:43
+#+macro: version Version 0.0.18
 
 * NPM
 ** About NPM
@@ -1622,7 +1622,230 @@ anything with a minimum of effort.  If someone hasn't already built what you
 need, authoring and publishing your own Grunt plugin to npm is a breeze.  See
 how to get started.
 
-* Mocha
+* Jest
+“Jest is a delightful JavaScript Testing Framework with a focus on simplicit.”
+
+- [[https://jestjs.io][Jest Home]]
+
+- [[https://jestjs.io/docs/en/getting-started][Jest Docs]]
+
+- [[https://jestjs.io/docs/en/api][Jest API]]
+
+- [[https://jestjs.io/blog/][Jest Blog]]
+
+It works with projects using: Babel, TypeScript, Node, React, Angular, Vue and
+more!
+
+{{{heading(Philosophy)}}}
+
+Jest is a JavaScript testing framework designed to ensure correctness of any
+JavaScript codebase.  It allows you to write tests with an approachable,
+familiar and feature-rich API that gives you results quickly.
+
+Jest is well-documented, requires little configuration and can be extended to
+match your requirements.
+
+{{{heading(Features)}}}
+
+- zero config :: Jest aims to work out of the box, config free, on most
+                 JavaScript projects.
+
+- snapshots :: Make tests which keep track of large objects with
+               ease. Snapshots live either alongside your tests, or embedded
+               inline.
+
+- isolated :: Tests are parallelized by running them in their own processes to
+              maximize performance.
+
+- great api :: From ~it~ to ~expect~ --- Jest has the entire toolkit in one
+               place.  Well documented, well maintained, well good.
+
+- FAST AND SAFE :: By ensuring your tests have unique global state, Jest can
+                   reliably run tests in parallel. To make things quick, Jest
+                   runs previously failed tests first and re-organizes runs
+                   based on how long test files take.
+
+- Code Coverage :: Generate code coverage by adding the flag --coverage. No
+                   additional setup needed. Jest can collect code coverage
+                   information from entire projects, including untested files.
+
+- Easy Mocking :: Jest uses a custom resolver for imports in your tests making
+                  it simple to mock any object outside of your test’s
+                  scope. You can use mocked imports with the rich Mock
+                  Functions API to spy on function calls with readable test
+                  syntax.
+
+- Great Exceptions :: Tests fail, when they do Jest provides rich context why,
+     here’s some examples:
+
+** Jest Documentation
+
+*** Jest Getting Started
+
+Jest documentation uses ~yarn~ commands.
+
+{{{heading(Install Jest)}}}
+
+: yarn add --dev jest
+
+{{{heading(Simple Tests)}}}
+
+{{{subheading(Test a function that adds two numbers)}}}
+
+#+caption: Function to add two numbers
+#+name:sum.js
+#+begin_src js -n
+function sum(a, b) {
+  return a + b;
+}
+module.exports = sum;
+#+end_src
+
+Create a file named ~sum.test.js~.  This will contain our actual test:
+
+#+caption:sum.test.js to test sum.js
+#+name:sum.test.js
+#+begin_src js -n
+const sum = require('./sum');
+
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+#+end_src
+
+This test uses ~expect~ and ~toBe~ to test that two values are exactly
+identical.  To learn about the other things that Jest can test, see [[https://jestjs.io/docs/en/using-matchers][Using
+Matchers]].
+
+{{{subheading(Update ~package.json~)}}}
+
+#+caption:Add test script to package.json
+#+name:package.json-test-script
+#+begin_src json
+{
+  "scripts": {
+    "test": "jest"
+  }
+}
+#+end_src
+
+{{{subheading(Use Yarn to test)}}}
+
+To test:
+
+: yarn test
+
+{{{noindent}}}and Jest will print this message:
+
+#+begin_example
+PASS  ./sum.test.js
+✓ adds 1 + 2 to equal 3 (5ms)
+#+end_example
+
+*** Run Jest from the Command Line
+You can run Jest directly from the CLI (if it's globally available in your
+PATH, e.g. by ~yarn global add jest~) with a variety of useful options.
+
+Here's how to run Jest on files matching ~my-test~, using ~config.json~ as a
+configuration file and display a native OS notification after the run:
+
+: jest my-test --notify --config=config.json
+
+If you'd like to learn more about running jest through the command line, take a
+look at the [[https://jestjs.io/docs/en/cli][Jest CLI Options]] page.
+
+*** Additional Configuration
+
+{{{heading(Generate a basic configuration file)}}}
+
+Based on your project, Jest will ask you a few questions and will create a
+basic configuration file with a short description for each option:
+
+: jest --init
+
+**** Configure Jest for Babel
+
+To use [[http://babeljs.io/][Babel]], install required dependencies via ~yarn~:
+
+: yarn add --dev babel-jest @babel/core @babel/preset-env
+
+{{{subheading(Configure Babel)}}}
+
+Configure Babel to target your current version of Node by creating a
+~babel.config.js~ file in the root of your project:
+
+#+caption: Babel Config file
+#+name:babel.config.js
+#+begin_src js -n
+// babel.config.js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          node: 'current',
+        },
+      },
+    ],
+  ],
+};
+#+end_src
+
+The ideal configuration for Babel will depend on your project.  See [[https://babeljs.io/docs/en/][Babel's
+docs]] for more details.
+
+{{{subheading(Configure Babel to use Jest)}}}
+
+Jest will set =process.env.NODE_ENV= to 'test' if it's not set to something
+else.  You can use that in your configuration to conditionally setup only the
+compilation needed for Jest, e.g.:
+
+#+caption: Make ~babel.config.js~ Jest-aware
+#+name:babel.config.js-jest-aware
+#+begin_src js -n
+// babel.config.js
+module.exports = api => {
+  const isTest = api.env('test');
+  // You can use isTest to determine what presets and plugins to use.
+
+  return {
+    // ...
+  };
+};
+#+end_src
+
+**** Configure Jest for Webpack
+Jest can be used in projects that use [[https://webpack.github.io/][webpack]] to manage assets, styles, and
+compilation.  ~webpack~ does offer some unique challenges over other tools.
+Refer to the [[https://jestjs.io/docs/en/webpack][webpack guide]] to get started.
+
+**** Configure Jest for TypeScript
+Jest supports TypeScript, via Babel.  First make sure you followed the
+instructions on using Babel above.  Next install the =@babel/preset-typescript=
+via ~yarn~:
+
+: yarn add --dev @babel/preset-typescript
+
+Then add =@babel/preset-typescript= to the list of presets in your
+~babel.config.js~.
+
+#+caption: Add TypeScript support to babel.config.js
+#+name:babel.config.js-for-typescript
+#+begin_src js -n
+// babel.config.js
+module.exports = {
+  presets: [
+    ['@babel/preset-env', {targets: {node: 'current'}}],
++    '@babel/preset-typescript',
+  ],
+};
+#+end_src
+
+Because TypeScript support in Babel is just transpilation, Jest will not
+type-check your tests as they are ran.  If you want that, you can use [[https://github.com/kulshekhar/ts-jest][ts-jest]].
+
+* mocha
 - https://mochajs.org
 - https://github.com/mochajs/mocha
 
