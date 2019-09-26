@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-26 11:24
-#+macro: version Version 0.0.19
+#+date:2019-09-26 11:48
+#+macro: version Version 0.0.20
 
 * NPM
 ** About NPM
@@ -1638,6 +1638,7 @@ more!
 
 {{{heading(Philosophy)}}}
 
+#+cindex:JasvaScript test framework
 Jest is a JavaScript testing framework designed to ensure correctness of any
 JavaScript codebase.  It allows you to write tests with an approachable,
 familiar and feature-rich API that gives you results quickly.
@@ -1680,16 +1681,22 @@ match your requirements.
 
 ** Jest Documentation
 
+#+cindex:Jest documentation
 *** Jest Getting Started
 
+#+cindex:Jest getting started
+#+cindex:getting started, Jest
 Jest documentation uses ~yarn~ commands.
 
+#+cindex:install Jest
 {{{heading(Install Jest)}}}
 
 : yarn add --dev jest
 
 {{{heading(Simple Tests)}}}
 
+#+cindex:Jest simple tests
+#+cindex:simple tests, Jest
 {{{subheading(Test a function that adds two numbers)}}}
 
 #+caption: Function to add two numbers
@@ -1703,6 +1710,7 @@ module.exports = sum;
 
 Create a file named ~sum.test.js~.  This will contain our actual test:
 
+#+cindex:.test.js
 #+caption:sum.test.js to test sum.js
 #+name:sum.test.js
 #+begin_src js -n
@@ -1713,12 +1721,16 @@ test('adds 1 + 2 to equal 3', () => {
 });
 #+end_src
 
+#+cindex:@code{expect}
+#+cindex:@code{toBe}
+#+cindex:exact equality
 This test uses ~expect~ and ~toBe~ to test that two values are exactly
 identical.  To learn about the other things that Jest can test, see [[https://jestjs.io/docs/en/using-matchers][Using
 Matchers]].
 
 {{{subheading(Update ~package.json~)}}}
 
+#+cindex:test script, Jest
 #+caption:Add test script to package.json
 #+name:package.json-test-script
 #+begin_src json
@@ -1733,6 +1745,8 @@ Matchers]].
 
 To test:
 
+#+cindex:yarn test
+#+cindex:test, yarn
 : yarn test
 
 {{{noindent}}}and Jest will print this message:
@@ -1743,6 +1757,8 @@ PASS  ./sum.test.js
 #+end_example
 
 *** Run Jest from the Command Line
+#+cindex:Jest from command line
+#+cindex:command line, Jest
 You can run Jest directly from the CLI (if it's globally available in your
 PATH, e.g. by ~yarn global add jest~) with a variety of useful options.
 
@@ -1751,6 +1767,7 @@ configuration file and display a native OS notification after the run:
 
 : jest my-test --notify --config=config.json
 
+#+cindex:CLI option, Jest
 If you'd like to learn more about running jest through the command line, take a
 look at the [[https://jestjs.io/docs/en/cli][Jest CLI Options]] page.
 
@@ -1758,6 +1775,8 @@ look at the [[https://jestjs.io/docs/en/cli][Jest CLI Options]] page.
 
 {{{heading(Generate a basic configuration file)}}}
 
+#+cindex:Jest init
+#+cindex:init, Jest
 Based on your project, Jest will ask you a few questions and will create a
 basic configuration file with a short description for each option:
 
@@ -1765,12 +1784,15 @@ basic configuration file with a short description for each option:
 
 **** Configure Jest for Babel
 
+#+cindex:Jest, Babel
+#+cindex:Babel, Jest
 To use [[http://babeljs.io/][Babel]], install required dependencies via ~yarn~:
 
 : yarn add --dev babel-jest @babel/core @babel/preset-env
 
 {{{subheading(Configure Babel)}}}
 
+#+cindex:configure Babel for Jest
 Configure Babel to target your current version of Node by creating a
 ~babel.config.js~ file in the root of your project:
 
@@ -1797,6 +1819,8 @@ docs]] for more details.
 
 {{{subheading(Configure Babel to use Jest)}}}
 
+#+cindex:@code{process.env.NODE_ENV}
+#+cindex:@code{isTest} function
 Jest will set =process.env.NODE_ENV= to 'test' if it's not set to something
 else.  You can use that in your configuration to conditionally setup only the
 compilation needed for Jest, e.g.:
@@ -1816,17 +1840,25 @@ module.exports = api => {
 #+end_src
 
 **** Configure Jest for Webpack
+#+cindex:Jest, Webpack
+#+cindex:Webpack, Jest
 Jest can be used in projects that use [[https://webpack.github.io/][webpack]] to manage assets, styles, and
 compilation.  ~webpack~ does offer some unique challenges over other tools.
 Refer to the [[https://jestjs.io/docs/en/webpack][webpack guide]] to get started.
 
 **** Configure Jest for TypeScript
+#+cindex:TypeScript, Jest
+#+cindex:Jest, TypeScript
+#+cindex:TypeScript, Babel, Jest
+#+cindex:Jest, TypeScript, Babel
+#+cindex:@code{@@babel/present-typescript}
 Jest supports TypeScript, via Babel.  First make sure you followed the
 instructions on using Babel above.  Next install the =@babel/preset-typescript=
 via ~yarn~:
 
 : yarn add --dev @babel/preset-typescript
 
+#+cindex:@code{babel.config.js}
 Then add =@babel/preset-typescript= to the list of presets in your
 ~babel.config.js~.
 
@@ -1842,10 +1874,12 @@ module.exports = {
 };
 #+end_src
 
+#+cindex:@code{ts-jest}
 Because TypeScript support in Babel is just transpilation, Jest will not
 type-check your tests as they are ran.  If you want that, you can use [[https://github.com/kulshekhar/ts-jest][ts-jest]].
 
 *** Jest Matchers
+#+cindex:matchers, Jest
 Jest uses "matchers" to let you test values in different ways.  This document
 will introduce some commonly used matchers.
 
@@ -2027,6 +2061,7 @@ test('compiling android goes as expected', () => {
 #+end_src
 
 *** Testing Asynchronous Code
+#+cindex:asynchronous code, Jest
 It's common in JavaScript for code to run asynchronously.  When you have code
 that runs asynchronously, Jest needs to know when the code it is testing has
 completed, before it can move on to another test.  Jest has several ways to
@@ -2070,6 +2105,7 @@ If ~done()~ is never called, the test will fail, which is what you want to
 happen.
 
 **** Promises
+#+cindex:Promises, Jest
 If your code uses promises, there is a simpler way to handle asynchronous
 tests.  Just return a promise from your test, and Jest will wait for that
 promise to resolve.  If the promise is rejected, the test will automatically
@@ -2137,6 +2173,7 @@ test('the fetch fails with an error', () => {
 #+end_src
 
 **** Async-Await
+#+cindex:async-await, Jest
 Alternatively, you can use =async= and =await= in your tests.  To write an
 =async= test, just use the =async= keyword in front of the function passed to
 test.  For example, the same ~fetchData~ scenario can be tested with:
@@ -2181,6 +2218,9 @@ match them across a codebase or even in a single file.  It just depends on
 which style makes your tests simpler.
 
 *** Setup and Teardown
+#+cindex:Jest setup, teardown
+#+cindex:setup
+#+cindex:teardown
 Often while writing tests you have some setup work that needs to happen before
 tests run, and you have some finishing work that needs to happen after tests
 run.  Jest provides helper functions to handle this.
@@ -2410,6 +2450,7 @@ shared state is being modified, you can also try a =beforeEach= that just logs
 data.
 
 *** Mock Functions
+#+cindex:mocking, Jest
 Mock functions make it easy to test the links between code by erasing the
 actual implementation of a function, capturing calls to the function (and the
 parameters passed in those calls), capturing instances of constructor functions
@@ -2694,7 +2735,7 @@ packages. Here's a list of the available packages:
 ** Jest Framework Guides
 
 ** Jest API Reference
-* mocha
+* Mocha
 - https://mochajs.org
 - https://github.com/mochajs/mocha
 
