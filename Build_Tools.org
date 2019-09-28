@@ -1,10 +1,16 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-26 11:48
-#+macro: version Version 0.0.20
+#+date:2019-09-28 09:33
+#+macro: version Version 0.0.21
 
 * NPM
+“Build Amazing Things”
+
+- [[https://www.npmjs.com][npm Home]]
+- [[https://docs.npmjs.com][npm Docs]]
+- [[https://docs.npmjs.com/getting-started/][npm Getting Started]]
+
 ** About NPM
 ** Getting Started
 ** Packages and Modules
@@ -285,6 +291,15 @@ node~, otherwise the scripts are started without the node executable!
 **** Shrinkwrap.json---A Publishable Lockfile
 
 *** Using NPM
+
+* Yarn
+“Fast, Reliable, and Secure Dependency Management”
+
+The currently installed Yarn version is src_sh{yarn --version}.
+
+- [[https://yarnpkg.com/en/][Yarn Home]]
+- [[https://yarnpkg.com/en/docs/getting-started][Yarn Getting Started]]
+- [[https://yarnpkg.com/en/docs][Yarn Docs]]
 
 * Babel
 ** Description
