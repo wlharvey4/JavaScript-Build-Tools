@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-10-02 11:02
-#+macro: version Version 0.0.24
+#+date:2019-10-02 11:13
+#+macro: version Version 0.0.25
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -3165,10 +3165,14 @@ exceptions:
 * JSLint by David Crockford
 “JSLint, The JavaScript Code Quality Tool”
 
-“JSLint is a JavaScript program that looks for problems in JavaScript
-programs.”
+{{{noindent}}}“JSLint is a JavaScript program that looks for problems in
+JavaScript programs.”
 
 [[file:resources/hmmm.png]]
+
+{{{subheading(How to properly take a quote out of context)}}}
+
+[[file:resources/right.png]] [[file:resources/damn.png]]
 
 - https://www.jslint.com
 - https://www.jslint.com/help.html
@@ -3280,7 +3284,6 @@ written in the form of a comment, where the directive name is placed
 immediately after the opening of the comment before any whitespace.  The three
 directives are =global=, =jslint=, and =property=.  Directives in a file are
 stronger than options selected from the UI or passed with the option object.
-
 
 * JSHint
 “A Static Code Analysis Tool for JavaScript”
