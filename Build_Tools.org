@@ -1,10 +1,10 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-09-28 09:33
-#+macro: version Version 0.0.21
+#+date:2019-10-02 09:44
+#+macro: version Version 0.0.22
 
-* NPM
+* Node Package Manager---npm
 “Build Amazing Things”
 
 - [[https://www.npmjs.com][npm Home]]
@@ -291,6 +291,114 @@ node~, otherwise the scripts are started without the node executable!
 **** Shrinkwrap.json---A Publishable Lockfile
 
 *** Using NPM
+
+* Node Version Manager---nvm
+- https://github.com/nvm-sh/nvm
+
+“Node Version Manager - POSIX-compliant bash script to manage multiple active
+node.js versions”
+
+** Usage
+
+{{{heading(Install a version of Node)}}}
+
+To download, compile, and install the latest release of node, do this:
+
+: nvm install node # "node" is an alias for the latest version
+
+To install a specific version of node:
+
+: nvm install 6.14.4 # or 10.10.0, 8.9.1, etc
+
+The first version installed becomes the default.  New shells will start with
+the default version of node (e.g., nvm alias default).
+
+{{{subheading(List available versions)}}}
+
+You can list available versions using ~ls-remote~:
+
+: nvm ls-remote
+
+{{{subheading(List installed versions)}}}
+
+: nvm ls
+
+{{{subheading(Use an installed version)}}}
+
+And then in any new shell just use the installed version:
+
+: nvm use node
+
+{{{subheading(Run an installed version)}}}
+
+Or you can just run it:
+
+: nvm run node --version
+
+Or, you can run any arbitrary command in a subshell with the desired version of
+node:
+
+: nvm exec 4.2 node --version
+
+{{{subheading(Path of installed version)}}}
+
+You can also get the path to the executable to where it was installed:
+
+: nvm which 5.0
+
+{{{heading(Use special default aliases)}}}
+
+In place of a version pointer like "0.10" or "5.0" or "4.2.1", you can use the
+following special default aliases with the above commands:
+
+- ~node~ :: this installs the latest version of node
+
+- ~iojs~ :: this installs the latest version of io.js
+
+
+Node has a schedule for long-term support (LTS).  You can reference LTS
+versions in aliases and ~.nvmrc~ files with the notation =lts/*= for the latest
+LTS, and =lts/argon= for LTS releases from the "argon" line, for example.
+
+Any time your local copy of nvm connects to https://nodejs.org, it will
+re-create the appropriate local aliases for all available LTS lines.  These
+aliases (stored under $NVM_DIR/alias/lts), are managed by nvm, and you should
+not modify, remove, or create these files - expect your changes to be undone,
+and expect meddling with these files to cause bugs that will likely not be
+supported.
+
+{{{heading(Migrating global packages while installing)}}}
+
+To install a new version of Node.js and migrate npm packages from a previous
+version:
+
+: nvm install node --reinstall-packages-from=node
+: nvm install 6 --reinstall-packages-from=5
+
+Note that reinstalling packages explicitly does not update the npm version —
+this is to ensure that npm isn't accidentally upgraded to a broken version for
+the new node version.  To update npm at the same time add the --latest-npm
+flag, like this:
+
+: nvm install lts/* --reinstall-packages-from=default --latest-npm
+
+{{{noindent}}}or, you can at any time run the following command to get the
+latest supported npm version on the current node version:
+
+: nvm install-latest-npm
+
+{{{heading(Error: “npm does not support Node.js”)}}}
+
+If you've already gotten an error to the effect of "npm does not support
+Node.js", you'll need to:
+
+1. revert to a previous node version 
+   : nvm ls & nvm use <your latest _working_ version from the ls>
+
+2. delete the newly created node version
+   : nvm uninstall <your _broken_ version of node from the ls>
+
+3. re-run your ~nvm install~ with the {{{option(--latest-npm)}}} flag.
 
 * Yarn
 “Fast, Reliable, and Secure Dependency Management”
