@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-10-02 10:42
-#+macro: version Version 0.0.23
+#+date:2019-10-02 11:02
+#+macro: version Version 0.0.24
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -3161,6 +3161,126 @@ exceptions:
 
 - ESLint is completely pluggable, every single rule is a plugin and you can add
   more at runtime.
+
+* JSLint by David Crockford
+“JSLint, The JavaScript Code Quality Tool”
+
+“JSLint is a JavaScript program that looks for problems in JavaScript
+programs.”
+
+[[file:resources/hmmm.png]]
+
+- https://www.jslint.com
+- https://www.jslint.com/help.html
+- https://github.com/douglascrockford/JSLint
+
+
+JavaScript is a young-for-its-age language.  It was originally intended to do
+small tasks in webpages, tasks for which Java was too heavy and clumsy.  But
+JavaScript is a surprisingly capable language, and it is now being used in
+larger projects.  Many of the features that were intended to make the language
+easy to use are troublesome when projects become complicated.  A lint for
+JavaScript is needed: JSLint, a JavaScript syntax checker and validator.
+
+JSLint takes a JavaScript source and scans it.  If it finds a problem, it
+returns a message describing the problem and an approximate location within the
+source.  The problem is not necessarily a syntax error, although it often is.
+JSLint looks at some style conventions as well as structural problems.  It does
+not prove that your program is correct.  It just provides another set of eyes
+to help spot problems.
+
+JSLint defines a professional subset of JavaScript, a stricter language than
+that defined by the ECMAScript Programming Language Standard (the strangely
+named document that governs JavaScript).  JSLint will reject most legal
+programs. It is a higher standard.
+
+** JSLint and Style
+The place to express yourself in programming is in the quality of your ideas and
+the efficiency of their execution. The role of style in programming is the same
+as in literature: It makes for better reading. A great writer doesn't express
+herself by putting the spaces before her commas instead of after, or by putting
+extra spaces inside her parentheses. A great writer will slavishly conform to
+some rules of style, and that in no way constrains her power to express herself
+creatively. See for example William Strunk's The Elements of Style.
+
+This applies to programming as well. Conforming to a consistent style improves
+readability, and frees you to express yourself in ways that matter. JSLint here
+plays the part of a stern but benevolent editor, helping you to get the style
+right so that you can focus your creative energy where it is most needed.
+
+** JSLint and ES2015 Support
+Some of ES6’s features are good, so JSLint will recognize the good parts of
+ES6.
+
+- The ... ellipsis marker in parameter lists and argument lists, replacing the
+  arguments object for variadic functions.
+
+- The let statement, which is like the var statement except that it respects
+  block scope. You may use let or var but not both.
+
+- The const statement is like the let statement except that it disallows the
+  use of assignment on the variable, although if the value of the variable is
+  mutable, it can still be mutated. const is preferred to let.
+
+- Destructuring of arrays and objects is allowed in parameter lists and on the
+  left side of let, and const, but not var or assignment statements, and not
+  deep destructuring or eliding.
+
+- Enhanced object literals, providing shorter forms for function declaration
+  and properties that are initialized by variables with the same name.
+
+- The fat arrow => fart functions.
+
+- The simplest forms of import and export.
+
+- `Megastring` literals, but not nested `megastring` literals.
+
+- New global functions, such as Map, Set, WeakMap, and WeakSet.
+
+- 0b- and 0o- number literals.
+
+
+{{{heading(Tail Call Semants in ES2015)}}}
+
+#+cindex:tail call
+The most important new feature of ES6 is proper tail calls.  This has no new
+syntax, so JSLint doesn’t see it.  But it makes recursion much more attractive,
+which makes loops, particularly for loops, much less attractive.
+
+{{{heading(Modules in ES2015)}}}
+
+The ES6 module feature will be an important improvement over JavaScript’s
+global variables as a means of linking separate files together.  JSLint
+recognizes a small but essential subset of the module syntax.
+
+#+begin_src js
+import name from stringliteral;
+
+import {name} from stringliteral;
+
+export default function () {};
+
+export default function name() {};
+
+export default expression;
+
+export function name() {}
+
+export name; // where name is const
+
+export {name};
+#+end_src
+
+** JSLint Directives
+
+JSLint provides three directives that may be placed in a file to manage
+JSLint’s behavior.  Use of these directives is optional.  If they are used,
+they should be placed in a source file before the first statement.  They are
+written in the form of a comment, where the directive name is placed
+immediately after the opening of the comment before any whitespace.  The three
+directives are =global=, =jslint=, and =property=.  Directives in a file are
+stronger than options selected from the UI or passed with the option object.
+
 
 * JSHint
 “A Static Code Analysis Tool for JavaScript”
