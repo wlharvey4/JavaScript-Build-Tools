@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-10-02 09:44
-#+macro: version Version 0.0.22
+#+date:2019-10-02 10:42
+#+macro: version Version 0.0.23
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -293,10 +293,10 @@ node~, otherwise the scripts are started without the node executable!
 *** Using NPM
 
 * Node Version Manager---nvm
-- https://github.com/nvm-sh/nvm
-
 “Node Version Manager - POSIX-compliant bash script to manage multiple active
 node.js versions”
+
+- https://github.com/nvm-sh/nvm
 
 ** Usage
 
@@ -3136,6 +3136,123 @@ beforeEach(function() {
 
 * Chai
 - https://www.chaijs.com
+
+* ESLint
+“The pluggable linting utility for JavaScript and JSX”
+
+- https://eslint.org
+
+
+ESLint is an open source project originally created by Nicholas C. Zakas in
+June 2013.  Its goal is to provide a pluggable linting utility for JavaScript.
+
+** Get Started with ESLint
+- https://eslint.org/docs/user-guide/getting-started
+
+
+ESLint is a tool for identifying and reporting on patterns found in
+ECMAScript/JavaScript code, with the goal of making code more consistent and
+avoiding bugs.  In many ways, it is similar to JSLint and JSHint with a few
+exceptions:
+
+- ESLint uses [[https://github.com/eslint/espree][Espree]] for JavaScript parsing.
+
+- ESLint uses an AST to evaluate patterns in code.
+
+- ESLint is completely pluggable, every single rule is a plugin and you can add
+  more at runtime.
+
+* JSHint
+“A Static Code Analysis Tool for JavaScript”
+
+- https://jshint.com/about/
+- https://jshint.com
+- https://github.com/jshint/jshint
+
+
+JSHint is a community-driven tool that detects errors and potential problems in
+JavaScript code.  Since JSHint is so flexible, you can easily adjust it in the
+environment you expect your code to execute.  JSHint is open source and will
+always stay this way.
+
+The project aims to help JavaScript developers write complex programs without
+worrying about typos and language gotchas.  Any code base eventually becomes
+huge at some point, so simple mistakes — that would not show themselves when
+written — can become show stoppers and add extra hours of debugging.  So,
+static code analysis tools come into play and help developers spot such
+problems.  JSHint scans a program written in JavaScript and reports about
+commonly made mistakes and potential bugs.  The potential problem could be a
+syntax error, a bug due to an implicit type conversion, a leaking variable, or
+something else entirely.
+
+Only 15% of all programs linted on jshint.com pass the JSHint checks. In all
+other cases, JSHint finds some red flags that could've been bugs or potential
+problems.  Please note, that while static code analysis tools can spot many
+different kind of mistakes, it can't detect if your program is correct, fast or
+has memory leaks.  You should always combine tools like JSHint with unit and
+functional tests as well as with code reviews.
+
+** JSHint Installation
+- https://jshint.com/install/
+
+
+JSHint runs in a number of different environments; installation is different
+for each.
+
+{{{heading(Node.js installation)}}}
+
+Each release of JSHint is published to npm, the package manager for the Node.js
+platform.
+
+{{{subheading(Install globally)}}}
+
+You may install it globally using the following command:
+: npm install -g jshint
+
+After this, you can use the jshint command-line interface.
+
+{{{subheading(Install locally as a development dependency)}}}
+
+It is common to install JSHint as a development dependency within an existing
+Node.js project:
+: npm install --save-dev jshint
+
+** JSHint Plugins for Text Editors
+{{{heading(Emacs)}}}
+
+- [[https://github.com/daleharvey/jshint-mode][jshint-mode]] :: JSHint mode for GNU Emacs.
+
+- [[https://github.com/lunaryorn/flycheck][Flycheck]] :: on-the-fly syntax checking extension for GNU Emacs, built-in
+     JSHint support.
+
+- [[http://web-mode.org/][web-mode]] :: an autonomous major-mode for editing web templates supports
+     JSHint.
+
+
+{{{heading(Atom)}}}
+
+- [[https://github.com/AtomLinter/linter-jshint][linter-jshint]] :: JSHint plugin for Atom's Linter.
+
+- [[https://github.com/sindresorhus/atom-jshint][JSHint for Atom]] :: JSHint package for Atom.
+
+** JSHint Documentation
+- https://jshint.com/docs/
+
+*** Basic Usage
+
+*** Configuration
+
+*** Command-Line Interface
+The JSHint CLI can be installed via npm (see the Installation page for
+instructions).
+
+- https://jshint.com/docs/cli/
+
+*** JSHint API
+JSHint exposes a JavaScript API for programmatic access in environments like
+web browsers and Node.js.
+
+- https://jshint.com/docs/api/
 
 * Concept Index
 :PROPERTIES:
