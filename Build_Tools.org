@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-10-03 09:30
-#+macro: version Version 0.0.26
+#+date:2019-10-03 18:27
+#+macro: version Version 0.0.27
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -2430,7 +2430,7 @@ within that =describe= block.
 For example, let's say we had not just a city database, but also a food
 database.  We could do different setup for different tests:
 
-#+caption:Example of scoping different test blocks
+#+caption[Example of scoping]:Example of scoping different test blocks
 #+name:scoping-example
 #+begin_src js -n
 // Applies to all tests in this file
@@ -2506,7 +2506,7 @@ finish and be tidied up before moving on.
 
 Consider the following illustrative test file and output:
 
-#+caption:Demonstration of order of execution
+#+caption[Order of Execution]:Demonstration of order of execution
 #+name:demonstrate-order-of-executiuon
 #+begin_src js -n
 describe('outer', () => {
@@ -2975,6 +2975,7 @@ packages. Here's a list of the available packages:
 **** pretty-format
 
 ** Jest Guides
+- [[https://devhints.io/jest][Jest Cheatsheet]]
 
 ** Jest Framework Guides
 
@@ -3498,11 +3499,32 @@ web browsers and Node.js.
 
 - https://jshint.com/docs/api/
 
+* List of Figures
+:PROPERTIES:
+:appendix: t
+:END:
+#+texinfo:@listoffloats Listing
+
 * Concept Index
 :PROPERTIES:
 :unnumbered: t
 :index:    cp
 :END:
+* Makefile
+:PROPERTIES:
+:appendix: t
+:END:
+#+caption:Makefile
+#+name:Makefile
+#+begin_src js -n :tangle Makefile
+clean:
+	-rm *~
+
+clean-world:	clean
+	-rm *.{info,texi}
+	-rm -rf examples/
+
+#+end_src
 * Export Settings
 #+options: H:4
 * Macro Definitions                                                :noexport:
