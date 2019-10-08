@@ -1,8 +1,8 @@
 # -*- mode:org -*-
 
 #+title:JavaScript Build Tools
-#+date:2019-10-06 10:17
-#+macro: version Version 0.0.29
+#+date:2019-10-07 18:05
+#+macro: version Version 0.0.30
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -330,15 +330,18 @@ But you can also do this:
 #+BEGIN_SRC js
   {
       "dependencies: {
-          "mongoose": "git@github.com:Automattic/mongoose.git#4.2.4"
+          "mongoose": "ssh://git@github.com:Automattic/mongoose.git#4.2.4"
       }
   }
 #+END_SRC
 
-You get slightly different output from ~npm list~ (show below), but you can
+{{{noindent}}}and install with:
+: yarn install
+
+You get slightly different output from ~yarn list~ (show below), but you can
 then ~require('mongoose')~ like you would normally.
 
-Upgrading is also easy: just change 4.2.4 to 4.2.7 and run ~npm install~
+Upgrading is also easy: just change 4.2.4 to 4.2.7 and run ~yarn install~
 normally.  Also, you're not limited to just version numbers.  You can list any
 git tag, git hash, or even branch after the =#= above.
 
@@ -365,9 +368,12 @@ git tag, git hash, or even branch after the =#= above.
 
 *** Install a Package from the Command Line using ~git~
 
-To install from the command line, use the below command.
+To install from the command line (in the absence of a ~package.json~ file), use
+the below command.  Yarn will create a ~package.json~ file and place ~mongoose~
+as a dependency in it.
 
-: $ npm install git+ssh://git@github.com/Automattic/mongoose.git#4.2.4
+: $ yarn install ssh://git@github.com/Automattic/mongoose.git#4.2.4
+: $ yarn list
 
 This also works with private repos.  As long as you can clone a repo, you can
 put it in your ~package.json~ dependencies.  The big advantage is that, instead
@@ -3622,9 +3628,3 @@ clean-world:	clean
 #+macro: dfn @@texinfo:@dfn{@@$1@@texinfo:}@@
 
 * Local Variables                                                  :noexport:
-# Local Variables:
-# fill-column:79
-# time-stamp-pattern:"8/^\\#\\+date:%:y-%02m-%02d %02H:%02M$"
-# eval: (org-indent-mode)
-# eval: (electric-quote-local-mode)
-# End:
