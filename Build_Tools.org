@@ -3,7 +3,7 @@
 #+title:JavaScript Build Tools
 #+subtitle: {{{version}}} {{{date}}}
 #+date:2019-10-08 10:10
-#+macro: version Version 0.0.31
+#+macro: version Version 0.0.32
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -3393,6 +3393,193 @@ beforeEach(function() {
 * Chai
 - https://www.chaijs.com
 
+* Jasmine
+“Behavior-Driven JavaScript”
+
+- https://jasmine.github.io
+- https://github.com/jasmine/jasmine
+  Simple JavaScript testing framework for browsers and node.js
+
+
+Jasmine is a behavior-driven development framework for testing
+JavaScript code.  It does not depend on any other JavaScript
+frameworks.  It does not require a DOM.  And it has a clean, obvious
+syntax so that you can easily write tests.
+
+
+- Fast :: Low overhead, jasmine-core has no external dependencies.
+- Batteries included :: Comes out of the box with everything you need
+     to test your code.
+- Node and browser :: Run your browser tests and Node.js tests with
+     the same framework.
+
+
+#+caption: Sample code
+#+name:sample-jasmine-code
+#+begin_src js -n
+describe("A suite is just a function", function() {
+  var a;
+
+  it("and so is a spec", function() {
+    a = true;
+
+    expect(a).toBe(true);
+  });
+});
+#+end_src
+
+** Getting Started with Node
+
+#+cindex:Jasmine Node getting started
+#+cindex:getting started, Node
+{{{heading(Install Jasmine)}}}
+
+#+cindex:Jasmine, install
+#+cindex:install Jasmine
+You can install Jasmine using ~yarn~ (or ~npm~), locally in your
+project and globally to use the CLI tool.[fn::npm install jasmine]
+
+: yarn add jasmine
+
+{{{heading(Init a Project)}}}
+
+#+cindex:jasmine init
+#+cindex:init jasmine
+#+cindex:initialize Jasmine
+Initialize a project for Jasmine by creating a ~spec~ directory and
+configuration json (~root/spec/jasmine.json~) for you.
+
+: yarn jasmine init
+
+{{{heading(Generate Examples)}}}
+
+#+cindex:Jasmine examples
+#+cindex:examples Jasmine
+: yarn jasmine examples
+
+At this point you should be able to write your [[https://jasmine.github.io/tutorials/your_first_suite.html][first suite]].
+
+*** Configuration under Node
+
+#+cindex:Node Jasmine configuration
+#+cindex:Jasmine configuration, Node
+#+cindex:configuration, Jasmine
+Customize ~spec/support/jasmine.json~ to enumerate the source files
+and spec files you would like the Jasmine runner to include.  You may
+use dir glob strings.
+
+Paths starting with =!= are excluded, for example =!**/*nospec.js=.
+
+~spec_dir~ is used as a prefix for all =spec_files= and =helpers=.
+=Helpers= are executed before =specs=.  For an example of some helpers
+see the [[https://jasmine.github.io/tutorials/react_with_npm][react tutorial]].
+
+#+caption: Customize Jasmine Json
+#+name: customize-jasmine-json
+#+begin_src js -n
+{
+  // Spec directory path relative to the current working dir when jasmine is executed.
+  "spec_dir": "spec",
+
+  // Array of filepaths (and globs) relative to spec_dir to include and exclude
+  "spec_files": [
+    "**/*[sS]pec.js",
+    "!**/*nospec.js"
+  ],
+
+  // Array of filepaths (and globs) relative to spec_dir to include before jasmine specs
+  "helpers": [
+    "helpers/**/*.js"
+  ],
+
+  // Stop execution of a spec after the first expectation failure in it
+  "stopSpecOnExpectationFailure": false,
+
+  // Run specs in semi-random order
+  "random": false
+}
+#+end_src
+
+*** Running Tests in Jasmine
+
+Once you have set up your ~jasmine.json~, you can execute all your
+specs by running ~jasmine~ from the root of your project (or node
+node_modules/jasmine/bin/jasmine.js if you had installed it locally).
+
+If you want to just run one spec or only those whom file names match a
+certain glob pattern you can do it like this:
+
+#+begin_src js -n
+jasmine spec/appSpec.js
+jasmine "**/model/**/critical/**/*Spec.js"
+#+end_src
+
+*** CLI Options
+
+**** JASMINE_CONFIG_PATH
+
+**** --no-color
+
+**** --filter= STRING
+
+**** --stop-on-failure= BOOL
+
+**** --random= BOOL
+
+**** --seed= BOOL
+
+**** --reporter= <valid node.js module name>
+
+*** Using the Library
+If you want more granular control over the configuration, Jasmine can
+also be used as a library in your project. This allows you to load
+multiple config files or control your configuration in different ways.
+
+#+caption: Using Jasmine as a Library
+#+name: jasmine-as-library
+#+begin_src js -n
+var Jasmine = require('jasmine');
+var jasmine = new Jasmine();
+#+end_src
+
+Load configuration from a file or from an object.
+
+#+begin_src js +n
+jasmine.loadConfigFile('spec/support/jasmine.json');
+
+jasmine.loadConfig({
+    spec_dir: 'spec',
+    spec_files: [
+        'appSpec.js',
+        'requests/**/*[sS]pec.js',
+        'utils/**/*[sS]pec.js'
+    ],
+    helpers: [
+        'helpers/**/*.js'
+    ]
+});
+#+end_src
+
+{{{heading(Custom onComplete)}}}
+
+Optionally specify a custom onComplete callback.  The callback is
+given a boolean of whether all of the specs passed or not.  This is
+often used to message a status to task runners like ~grunt~.
+
+#+begin_src js +n
+jasmine.onComplete(function(passed) {
+    if(passed) {
+        console.log('All specs have passed');
+    }
+    else {
+        console.log('At least one spec has failed');
+    }
+});
+#+end_src
+
+{{{headingReporters}}}
+
+
 * ESLint
 “The pluggable linting utility for JavaScript and JSX”
 
@@ -3662,6 +3849,7 @@ clean-prod:  clean
 	-rm *.{texi}
 #+end_src
 * Export Settings
+#+startup: indent
 #+options: H:4
 * Macro Definitions                                                :noexport:
 #+macro: heading @@texinfo:@heading@@ $1
