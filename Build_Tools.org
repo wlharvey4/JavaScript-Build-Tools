@@ -3,7 +3,7 @@
 #+title:JavaScript Build Tools
 #+subtitle: {{{version}}} {{{date}}}
 #+date:2019-10-08 10:10
-#+macro: version Version 0.0.32
+#+macro: version Version 0.0.33
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -3820,6 +3820,92 @@ web browsers and Node.js.
 
 - https://jshint.com/docs/api/
 
+* YUI Demise
+- https://yahooeng.tumblr.com/post/96098168666/important-announcement-regarding-yui
+
+- Node.JS
+
+- npm
+
+- bower
+
+- Grunt
+
+- Broccoli
+
+- Gulp
+
+- Backbone
+
+- React
+
+- Ember
+
+- Polymer
+
+- Angular
+
+- Mocha
+
+- Casper
+
+- Karma
+
+- W3C
+
+- Ecma
+
+- evergreen web browsers
+
+The Yahoo User Interface library (YUI) has been in use at Yahoo since
+2005, and was first announced to the public on February 13, 2006.
+Although it has evolved tremendously since that time, YUI has always
+served the same overarching purpose of providing a comprehensive
+toolkit to make it easier for developers to create rich web
+applications.  As such, YUI is an important part of Yahoo’s history:
+millions of lines of code relying on YUI have been written and are
+still in use at Yahoo today.  However, it has become clear to us that
+the industry is now headed in a new direction.  As most of you know,
+the web platform has been undergoing a drastic transformation over the
+past few years.  JavaScript is now more ubiquitous than ever.  The
+emergence of *Node.JS* has allowed JavaScript to be used on the server
+side, opening the door to creating isomorphic single page
+applications.  New package managers (*npm*, *bower*) have spurred the
+rise of an ecosystem of 3rd party, open source, single-purpose tools
+that complement each other, embracing the UNIX philosophy and enabling
+very complex development use cases.  New build tools (*Grunt* and its
+ecosystem of plugins, *Broccoli*, *Gulp*) have made it easier to
+assemble those tiny modules into large, cohesive applications.  New
+application frameworks (*Backbone*, *React*, *Ember*, *Polymer*,
+*Angular*, etc.) have helped architect web applications in a more
+scalable and maintainable way.  New testing tools (*Mocha*, *Casper*,
+*Karma*, etc.) have lowered the barrier of entry to building a solid
+continuous delivery pipeline.  Standard bodies (W3C, Ecma) are
+standardizing what the large JavaScript frameworks have brought to the
+table over the years, making them available natively to a larger
+number of devices.  Finally, browser vendors are now committed to
+making continuous improvements to their web browsers while aligning
+more closely with standards.  With so called “evergreen web browsers”,
+which are making it easier for users to run the latest stable version
+of a web browser, we can expect a significant reduction in the amount
+of variance across user agents.
+
+The consequence of this evolution in web technologies is that large
+JavaScript libraries, such as YUI, have been receiving less attention
+from the community.  Many developers today look at large JavaScript
+libraries as walled gardens they don’t want to be locked into.  As a
+result, the number of YUI issues and pull requests we’ve received in
+the past couple of years has slowly reduced to a trickle.  Most core
+YUI modules do not have active maintainers, relying instead on a slow
+stream of occasional patches from external contributors. Few reviewers
+still have the time to ensure that the patches submitted are reviewed
+quickly and thoroughly.
+
+Therefore, we have made the difficult decision to immediately stop all
+new development on YUI in order to focus our efforts on this new
+technology landscape. This means that, going forward, new YUI releases
+will likely be few and far between, and will only contain targeted
+fixes that are absolutely critical to Yahoo properties.
 * List of Figures
 :PROPERTIES:
 :appendix: t
