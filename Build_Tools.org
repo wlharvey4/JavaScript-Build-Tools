@@ -3,7 +3,7 @@
 #+title:JavaScript Build Tools
 #+subtitle: {{{version}}} {{{date}}}
 #+date:2019-10-08 10:10
-#+macro: version Version 0.0.33
+#+macro: version Version 0.0.34
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -1861,7 +1861,7 @@ something.
 * Grunt
 - [[https://gruntjs.com][Gunt Home]]
 
-The JavaScript task runner.
+The JavaScript task runner[fn:1].
 
 {{{heading(Why use a task runner?)}}}
 
@@ -1878,6 +1878,12 @@ hundreds of plugins to choose from, you can use Grunt to automate just about
 anything with a minimum of effort.  If someone hasn't already built what you
 need, authoring and publishing your own Grunt plugin to npm is a breeze.  See
 how to get started.
+
+** Install Grunt
+Grunt is installed as a development dependency with npm (or yarn),
+along with plugins:
+
+: yarn add --dev grunt grunt-cli grunt-ts
 
 * Jest
 “Jest is a delightful JavaScript Testing Framework with a focus on simplicit.”
@@ -3579,7 +3585,6 @@ jasmine.onComplete(function(passed) {
 
 {{{headingReporters}}}
 
-
 * ESLint
 “The pluggable linting utility for JavaScript and JSX”
 
@@ -3822,6 +3827,7 @@ web browsers and Node.js.
 
 * YUI Demise
 - https://yahooeng.tumblr.com/post/96098168666/important-announcement-regarding-yui
+- https://github.com/yui
 
 - Node.JS
 
@@ -3947,3 +3953,9 @@ clean-prod:  clean
 #+macro: dfn @@texinfo:@dfn{@@$1@@texinfo:}@@
 
 * Local Variables                                                  :noexport:
+
+* Footnotes
+
+[fn:1] A /task runner/ is a tool used to automatically perform
+frequent tasks such as minification, compilation, unit testing, and
+linting. 
