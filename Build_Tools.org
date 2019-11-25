@@ -3,7 +3,7 @@
 #+title:JavaScript Build Tools
 #+subtitle: {{{version}}} {{{date}}}
 #+date:2019-10-08 10:10
-#+macro: version Version 0.0.34
+#+macro: version Version 0.0.35
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -3912,6 +3912,13 @@ new development on YUI in order to focus our efforts on this new
 technology landscape. This means that, going forward, new YUI releases
 will likely be few and far between, and will only contain targeted
 fixes that are absolutely critical to Yahoo properties.
+* lerna
+- https://lerna.js.org/
+- https://github.com/lerna/lerna
+
+
+“A tool for managing JavaScript projects with multiple packages.”
+
 * List of Figures
 :PROPERTIES:
 :appendix: t
