@@ -3,7 +3,7 @@
 #+title:JavaScript Build Tools
 #+subtitle: {{{version}}} {{{date}}}
 #+date:2019-10-08 10:10
-#+macro: version Version 0.0.36
+#+macro: version Version 0.0.37
 
 * Node Package Manager---npm
 “Build Amazing Things”
@@ -4001,6 +4001,23 @@ Here are some other cool features Next.js brings to the table:
 ** Quick Start
 
 : yarn create next-app
+
+* GatsbyJS
+“Fast in every way that matters”
+
+Gatsby is a free and open source framework based on React that helps
+developers build blazing fast websites and apps
+
+** TODO Gatsby’s Blog Starter
+
+- https://www.gatsbyjs.org/starters/?v=2
+
+- https://github.com/gatsbyjs/gatsby-starter-blog
+
+
+Kick off your project with this blog boilerplate.  This starter ships
+with the main Gatsby configuration files you might need to get up and
+running blazing fast with the blazing fast app generator for React.
 
 * List of Figures
 :PROPERTIES:
